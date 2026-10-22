@@ -18,6 +18,7 @@ export abstract class Shape {
 
   get label(): string { return `${this.tag}#${this.id}`; }
   get text(): string { return this.content; }
+  get supportsText(): boolean { return this.acceptsText(); }
   get children(): readonly Shape[] { return []; }
   get isContainer(): boolean { return false; }
   get attributes(): Readonly<Record<string, string>> { return Object.fromEntries(this.values); }
