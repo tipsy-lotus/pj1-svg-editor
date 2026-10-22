@@ -1,0 +1,27 @@
+# 两节点流程图：从上到下创建容器和内容
+init 800 300
+create g flowchart
+create g node1 in flowchart
+create rect start 120 100 160 60 #4a90d9 in node1
+create text start-label 155 135 "开始" in node1
+set start-label fill white
+create g node2 in flowchart
+create rect process 520 100 160 60 #f5a623 in node2
+create text process-label 545 135 "处理数据" in node2
+set process-label fill white
+create line edge 280 130 520 130 black in flowchart
+
+# 整组移动、撤销、重做，再还原布局
+move node2 0 100
+undo
+redo
+undo
+set process-label text "处理数据 v2"
+show process-label
+tree
+
+# 保存并读回；此时建立历史屏障
+save flowchart.svg
+read flowchart.svg
+tree node2
+quit

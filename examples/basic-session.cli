@@ -1,0 +1,24 @@
+# 基础编辑、分组、层级顺序和历史
+init 800 600
+create rect bg 0 0 800 600 #ffffff
+create text title 20 40 "My Diagram"
+create circle c1 100 100 20 red
+create rect box 200 80 60 60 #3366ff
+group markers c1 box
+tree
+move c1 30 0
+undo
+redo
+set title text "My Diagram v2"
+undo
+delete box
+undo
+front bg
+back bg
+save demo.svg
+
+# 读取外部文档，缺失 ID 产生警告
+read examples/import-example.svg
+show rect1
+tree
+quit
