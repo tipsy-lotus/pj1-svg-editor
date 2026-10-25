@@ -133,7 +133,11 @@ test('CLI 读写支持带空格路径、导入警告、默认保存及保存后�
   assert.equal(new SvgCodec().decode(files.read('导入 文件.svg')).document.find('rect1').attributes.x, '10');
   assert.deepEqual(cli.execute('undo'), ['error: undo not allowed after io command']);
   assert.deepEqual(cli.execute('save "另存 文件.svg"'), ['saved to 另存 文件.svg (1 elements)']);
-  assert.equal(session.currentPath, '另存 文件.svg');
+  assert.equal(session.currentPath, '导入 文件.svg');
+  cli.execute('move rect1 5 0');
+  assert.deepEqual(cli.execute('save'), ['saved to 导入 文件.svg (1 elements)']);
+  assert.equal(new SvgCodec().decode(files.read('导入 文件.svg')).document.find('rect1').attributes.x, '15');
+  assert.equal(new SvgCodec().decode(files.read('另存 文件.svg')).document.find('rect1').attributes.x, '10');
 });
 
 test('失败读取只输出错误，不泄漏解析中已暂存的自动 ID 警告', () => {
@@ -235,4 +239,18 @@ test('完整回放基础会话示例，保存原文档后成功导入外部文�
   assert.equal(original.children[0]!.id, 'bg');
   assert.equal(session.document.all().length, 7);
   assert.match(output, /warning: assigned id rect1 to unnamed <rect>/);
+});
+
+test('CLI 新建文档另存后不产生读入路径，无参数保存报错且可继续撤销', () => {
+  const files = new MemoryFileStore(); const session = new EditorSession(new SvgFileRepository(files));
+  const cli = new CommandDispatcher(session);
+  cli.execute('init'); cli.execute('create rect r 1 2 3 4'); cli.execute('save created.svg');
+  cli.execute('move r 5 0');
+  const before = session.document.clone();
+  assert.deepEqual(cli.execute('save'), ["error: no read path. specify 'save <file.svg>'"]);
+  assert.deepEqual(session.document, before);
+  assert.equal(session.currentPath, undefined);
+  assert.equal(new SvgCodec().decode(files.read('created.svg')).document.find('r').attributes.x, '1');
+  assert.deepEqual(cli.execute('undo'), ['undone: move r']);
+  assert.equal(session.document.find('r').attributes.x, '1');
 });
