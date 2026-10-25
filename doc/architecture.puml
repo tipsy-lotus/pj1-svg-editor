@@ -1,0 +1,15 @@
+@startuml
+package "cli" as CLI
+package "application" as App
+package "commands" as Cmd
+package "model" as Model
+package "io" as IO
+CLI --> App
+CLI --> Cmd
+CLI --> Model
+App --> Cmd
+App --> Model
+App --> IO
+Cmd --> Model
+IO --> Model
+@enduml

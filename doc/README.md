@@ -47,23 +47,8 @@ svg> quit
 | `src/main.ts` | 装配各模块 |
 | `test`、`examples` | 自动化测试、示例 SVG 和命令回放案例 |
 
-```plantuml
-@startuml
-package "cli" as CLI
-package "application" as App
-package "commands" as Cmd
-package "model" as Model
-package "io" as IO
-CLI --> App
-CLI --> Cmd
-CLI --> Model
-App --> Cmd
-App --> Model
-App --> IO
-Cmd --> Model
-IO --> Model
-@enduml
-```
+![项目模块依赖图](images/architecture.svg)
+[查看 PlantUML 图源](architecture.puml)
 
 ### 设计模式
 
