@@ -5,7 +5,7 @@ import { SvgDocument } from '../model/SvgDocument.js';
 
 export class EditorSession {
   private current?: SvgDocument;
-  private path?: string;
+  private readPath?: string;
   private readonly history = new History();
 
   constructor(private readonly repository: SvgFileRepository) {}
@@ -15,26 +15,26 @@ export class EditorSession {
     return this.current;
   }
 
-  get currentPath(): string | undefined { return this.path; }
+  get currentPath(): string | undefined { return this.readPath; }
 
   init(width = 800, height = 600): string {
     const document = new SvgDocument(width, height);
-    this.current = document; this.path = undefined; this.history.barrier();
+    this.current = document; this.readPath = undefined; this.history.barrier();
     return `canvas ${document.width}x${document.height} created`;
   }
 
   read(path: string): readonly string[] {
     const { document, warnings } = this.repository.read(path);
-    this.current = document; this.path = path; this.history.barrier();
+    this.current = document; this.readPath = path; this.history.barrier();
     return [...warnings, `read ${path} (${document.all().length} elements)`];
   }
 
   save(path?: string): string {
     const document = this.document;
-    const target = path ?? this.path;
-    if (target === undefined) throw new Error("no file path. use 'save <file.svg>' first");
+    const target = path ?? this.readPath;
+    if (target === undefined) throw new Error("no read path. specify 'save <file.svg>'");
     this.repository.save(document, target);
-    this.path = target; this.history.barrier();
+    this.history.barrier();
     return `saved to ${target} (${document.all().length} elements)`;
   }
 
