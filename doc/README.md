@@ -162,3 +162,56 @@ CLI 的 `Tokenizer` 保留参数是否加引号，`CommandDispatcher` 集中分�
 - **行为测试**：`npm run test:in-process` 通过，共 95 项（模型 21、命令 19、读写 20、会话 13、CLI 22）；断言属性、层级、顺序、历史和文件状态，不仅检查提示信息。
 - **回归验证**：保留空组参数、子树 ID 冲突、命令重复执行及溢出回滚用例，防止问题再次出现。
 - **结构检查**：已检查全部 34 个生产源码文件的导入关系，补全应用层对 IO 仓库的依赖说明；源代码、测试、示例和 `doc/README.md` 均已纳入版本管理。
+
+## Phase 2 进展：VSCode 扩展
+
+扩展源码位于 `vscode-extension/`，独立构建，文件标记、大纲定位、编辑更新与异常恢复已在开发窗口验证。CLI 插件重构尚未开始。
+
+### 启动与验证
+
+使用 Node.js 24.14.0，在项目根目录运行：
+
+```powershell
+npm.cmd --prefix vscode-extension ci
+npm.cmd --prefix vscode-extension run check
+npm.cmd --prefix vscode-extension run test:in-process
+```
+
+用 VSCode 打开项目根目录，按 F5 选择“调试 SVG 扩展”。在新窗口以文本方式打开 `outline.svg`，展开原生“大纲”。重建后需关闭旧调试窗口再按 F5，或在开发窗口执行 `Developer: Reload Window`。
+
+| 验证项 | 操作与预期 |
+| --- | --- |
+| 文件标记 | `outline.svg` 旁显示 `[]`；`note.txt`、`folder.svg` 目录不标记；文件名和内容保持不变 |
+| 层级与定位 | 展开 `svg → g#flowchart`，可见 `rect#start`、无 id 的 `text` 和嵌套 `g#next`；点击 `rect#start` 定位到第 3 行 |
+| 未保存编辑 | 将 `start` 改为 `begin`，不保存也应更新为 `rect#begin` |
+| 不完整 XML | 删除末尾 `</svg>`，大纲暂时清空；恢复后重新出现，扩展不崩溃 |
+
+我在扩展开发窗口完成了上表验证，并保存以下运行截图。大纲中若同时出现“XML”和“PJ1 SVG Tools”，本项目提供的是后者；文件旁的 `U` 是 Git 状态，`[]` 才是 SVG 标记。
+
+![SVG 文件标记：普通文件与同名目录不加标记](images/vscode-svg-badge.png)
+
+![大纲层级与 rect#start 的第 3 行源码定位](images/vscode-svg-outline.png)
+
+[未保存编辑更新为 rect#begin](images/vscode-svg-begin.png) · [删除闭合标签后本扩展大纲清空](images/vscode-svg-incomplete.png) · [恢复闭合标签后节点重新出现](images/vscode-svg-recovered.png)
+
+异常截图中保留的无 id 树由其他 XML 扩展提供，不是本扩展的残留节点。验证结束后，我已将示例恢复为 `id="start"` 和完整 XML。题目目录中的 JPG 仅是参考，本节使用的 PNG 是实际运行截图。
+
+### 职责与模式分析
+
+`extension.ts` 是装配入口，向 VSCode 注册 `SvgFileDecorationProvider` 和 `SvgDocumentSymbolProvider`，并将资源放入 `context.subscriptions`。VSCode 管理 Explorer、大纲界面、编辑后的重新查询和节点定位；扩展只返回标记或带源码范围的元素树，不自行绘制界面，也不改写 SVG 文件。
+
+文件装饰与经典 Decorator 都体现了追加展示信息，但这里由 VSCode 调用提供器并合成效果，没有包装原文件对象并转发同一接口的完整结构，因此不能仅凭名称就认定为经典 Decorator。`SvgDocumentSymbolProvider` 则承担适配器职责：将独立解析器生成的 `OutlineElement` 转为宿主要求的 `DocumentSymbol`，把字符偏移转为 `Range`；VSCode 是客户端，解析结果是被适配的数据。
+
+### Phase 1 复用评估
+
+我保留了 Phase 1 的 CLI 代码。其 XML 解析依赖所用的 `sax` 可以复用，但 `SvgCodec` 会分配缺失 id、限制可读类型，且结果不保留源码范围；领域模型和遍历逻辑也依赖这些转换后的对象，不能直接满足大纲的源码定位和任意 XML 元素展示。因此扩展直接依赖 `sax`，通过独立解析器保留层级及源码偏移，不导入 CLI 内部模块。解析不完整输入时返回空树，下一次查询重新解析当前编辑内容。
+
+### 检查与协作记录
+
+| 节点 | AI 辅助内容 | 我的检查与当前结果 |
+| --- | --- | --- |
+| 原生大纲观察 | 提供视图位置与观察方法 | 我打开 SVG 后看到“活动编辑器无法提供大纲信息”，确认实现前没有可用大纲 |
+| API 与实现 | 协助查询注册接口，提供文件装饰、源码范围适配与测试代码草稿 | 我在开发窗口核对文件标记、嵌套层级、无 id 元素及第 3 行定位，并保存截图 |
+| 自动化检查 | 补充同名目录、未保存编辑、中文与 emoji 偏移、异常输入等边界用例 | 扩展类型检查及 9 项自动化测试通过；测试使用宿主 API 替身，不能代替真实界面验证 |
+| 大纲排查 | 根据实际反馈补充当前文本文件、匹配状态和解析结果的诊断；启动时自动打开示例，并在示例工作区指定 SVG 使用文本编辑器 | 调整后，我确认大纲能够显示和定位；原先未显示的具体原因未完全确认 |
+| 异常与恢复 | 建议将编辑更新、不完整 XML 和恢复分开留证 | 我验证未保存编辑也会更新；删除 `</svg>` 后本扩展大纲清空，恢复后节点重新出现，随后恢复并保存原示例 |
