@@ -1,7 +1,7 @@
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
 import { AddToCommand } from '../src/commands/AddToCommand.js';
-import { CreateCommand } from '../src/commands/CreateCommand.js';
+import { DefaultCreateCommand as CreateCommand } from './support/DefaultCreateCommand.js';
 import { DeleteCommand } from '../src/commands/DeleteCommand.js';
 import { GroupCommand } from '../src/commands/GroupCommand.js';
 import { History } from '../src/commands/History.js';
@@ -11,7 +11,7 @@ import { ScaleCommand } from '../src/commands/ScaleCommand.js';
 import { SetCommand } from '../src/commands/SetCommand.js';
 import { UngroupCommand } from '../src/commands/UngroupCommand.js';
 import { Group } from '../src/model/Group.js';
-import { ShapeFactory } from '../src/model/ShapeFactory.js';
+import { DefaultShapes as ShapeFactory } from '../src/host/DefaultShapes.js';
 import { SvgDocument } from '../src/model/SvgDocument.js';
 
 const factory = new ShapeFactory();

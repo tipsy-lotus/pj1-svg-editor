@@ -165,7 +165,7 @@ CLI 的 `Tokenizer` 保留参数是否加引号，`CommandDispatcher` 集中分�
 
 ## Phase 2 进展：VSCode 扩展
 
-扩展源码位于 `vscode-extension/`，独立构建，文件标记、大纲定位、编辑更新与异常恢复已在开发窗口验证。CLI 插件重构尚未开始。
+扩展源码位于 `vscode-extension/`，独立构建，文件标记、大纲定位、编辑更新与异常恢复已在开发窗口验证。CLI 重构进展见下节；前文架构和 95 项测试记录保留为 Phase 1 对照。
 
 ### 启动与验证
 
@@ -192,7 +192,11 @@ npm.cmd --prefix vscode-extension run test:in-process
 
 ![大纲层级与 rect#start 的第 3 行源码定位](images/vscode-svg-outline.png)
 
-[未保存编辑更新为 rect#begin](images/vscode-svg-begin.png) · [删除闭合标签后本扩展大纲清空](images/vscode-svg-incomplete.png) · [恢复闭合标签后节点重新出现](images/vscode-svg-recovered.png)
+[未保存编辑更新为 rect#begin](images/vscode-svg-begin.png)
+
+[删除闭合标签后本扩展大纲清空](images/vscode-svg-incomplete.png) 
+
+[恢复闭合标签后节点重新出现](images/vscode-svg-recovered.png)
 
 异常截图中保留的无 id 树由其他 XML 扩展提供，不是本扩展的残留节点。验证结束后，我已将示例恢复为 `id="start"` 和完整 XML。题目目录中的 JPG 仅是参考，本节使用的 PNG 是实际运行截图。
 
@@ -215,3 +219,26 @@ npm.cmd --prefix vscode-extension run test:in-process
 | 自动化检查 | 补充同名目录、未保存编辑、中文与 emoji 偏移、异常输入等边界用例 | 扩展类型检查及 9 项自动化测试通过；测试使用宿主 API 替身，不能代替真实界面验证 |
 | 大纲排查 | 根据实际反馈补充当前文本文件、匹配状态和解析结果的诊断；启动时自动打开示例，并在示例工作区指定 SVG 使用文本编辑器 | 调整后，我确认大纲能够显示和定位；原先未显示的具体原因未完全确认 |
 | 异常与恢复 | 建议将编辑更新、不完整 XML 和恢复分开留证 | 我验证未保存编辑也会更新；删除 `</svg>` 后本扩展大纲清空，恢复后节点重新出现，随后恢复并保存原示例 |
+
+## Phase 2 进展：CLI 图形扩展点
+
+本次先拆分图形名称分派，尚未达到“四个扩展点齐备”的节点。命令注册、属性处理器、树标签、统一加载与回滚、指标脚本仍待实现，`box`、`stats`、`dir` 也尚未接入。
+
+| 扩展点 | 职责与调用位置 | 实现与缺省行为 | 契约错误 |
+| --- | --- | --- | --- |
+| `ShapeProvider` | `ShapeFactory.create/fromSvg` 调用创建和读回；`CommandDispatcher.help` 读取提供器文案 | `plugins/builtin-shapes` 注册六类；宿主 `DefaultShapes` 默认装配；空注册表能启动，但创建或读回未注册类型时报未知图形 | 重名拒绝；元数据/方法非法拒绝；最高读回优先级并列拒绝；返回类型或 id 错误拒绝；提供器抛错保留原文档及历史 |
+
+依赖方向为：`main/host → 内核与插件`，`builtin-shapes → ShapeProvider 与公开领域类`，内核通过接口调用提供器，不反向导入插件或宿主。创建、读回共用注册表。读回先完成子树解析，再由提供器构造完整对象；优先级与降级决策见 [ADR 001](adr/001-shape-provider.md)。当前内置插件入口仍是直接代码装配，后续接入统一加载事务，尚不声称已满足配置装配要求。
+
+验证命令：
+
+```powershell
+npm.cmd run check
+npm.cmd run test:in-process
+& ./scripts/check-phase1.ps1
+```
+
+CLI 测试共 103 项通过：保留原有 95 项行为断言，新增 8 项图形扩展点测试。测试中的默认仓库、创建命令与分发器由 `test/support/Default*.ts` 显式装配，避免内核为兼容旧构造方式而重新依赖默认插件。
+
+回放脚本从 `final` 取出源码进行构建，在 `.cache/shape-compatibility/` 的两份独立工作目录运行真实 CLI 入口。相同输入包含 help、基础会话和流程图会话，输出逐字节一致；生成的 `demo.svg` 与 `flowchart.svg` 也逐字节一致。原有命令脚本只有命令和注释，不含提示符或示例输出。日志与临时产物不提交。
+

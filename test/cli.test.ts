@@ -1,13 +1,14 @@
+import { DefaultShapes as ShapeFactory } from '../src/host/DefaultShapes.js';
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
 import { Readable, Writable } from 'node:stream';
 import { readFileSync } from 'node:fs';
 import { EditorSession } from '../src/application/EditorSession.js';
-import { CommandDispatcher } from '../src/cli/CommandDispatcher.js';
+import { DefaultDispatcher as CommandDispatcher } from './support/DefaultDispatcher.js';
 import { Repl } from '../src/cli/Repl.js';
 import { Tokenizer } from '../src/cli/Tokenizer.js';
 import { SvgCodec } from '../src/io/SvgCodec.js';
-import { SvgFileRepository } from '../src/io/SvgFileRepository.js';
+import { DefaultRepository as SvgFileRepository } from './support/DefaultRepository.js';
 import { MemoryFileStore } from './support/MemoryFileStore.js';
 
 test('分词支持整行注释、空行、BOM、引号空参数和颜色中的井号', () => {
@@ -130,14 +131,14 @@ test('CLI 读写支持带空格路径、导入警告、默认保存及保存后�
     'warning: assigned id rect1 to unnamed <rect>', 'read 导入 文件.svg (1 elements)',
   ]);
   cli.execute('move rect1 10 20'); assert.deepEqual(cli.execute('save'), ['saved to 导入 文件.svg (1 elements)']);
-  assert.equal(new SvgCodec().decode(files.read('导入 文件.svg')).document.find('rect1').attributes.x, '10');
+  assert.equal(new SvgCodec(new ShapeFactory()).decode(files.read('导入 文件.svg')).document.find('rect1').attributes.x, '10');
   assert.deepEqual(cli.execute('undo'), ['error: undo not allowed after io command']);
   assert.deepEqual(cli.execute('save "另存 文件.svg"'), ['saved to 另存 文件.svg (1 elements)']);
   assert.equal(session.currentPath, '导入 文件.svg');
   cli.execute('move rect1 5 0');
   assert.deepEqual(cli.execute('save'), ['saved to 导入 文件.svg (1 elements)']);
-  assert.equal(new SvgCodec().decode(files.read('导入 文件.svg')).document.find('rect1').attributes.x, '15');
-  assert.equal(new SvgCodec().decode(files.read('另存 文件.svg')).document.find('rect1').attributes.x, '10');
+  assert.equal(new SvgCodec(new ShapeFactory()).decode(files.read('导入 文件.svg')).document.find('rect1').attributes.x, '15');
+  assert.equal(new SvgCodec(new ShapeFactory()).decode(files.read('另存 文件.svg')).document.find('rect1').attributes.x, '10');
 });
 
 test('失败读取只输出错误，不泄漏解析中已暂存的自动 ID 警告', () => {
@@ -221,7 +222,7 @@ test('完整回放两节点示例，保存读回后布局、文字及层级一�
   assert.equal(session.document.find('process').attributes.y, '100');
   assert.equal(session.document.find('process-label').text, '处理数据 v2');
   assert.equal(session.document.parentLabel(session.document.find('process-label')), 'g#node2');
-  assert.equal(new SvgCodec().decode(files.read('flowchart.svg')).document.find('edge').attributes.stroke, 'black');
+  assert.equal(new SvgCodec(new ShapeFactory()).decode(files.read('flowchart.svg')).document.find('edge').attributes.stroke, 'black');
   assert.match(output, /saved to flowchart.svg \(8 elements\)/); assert.match(output, /read flowchart.svg \(8 elements\)/);
 });
 
@@ -232,7 +233,7 @@ test('完整回放基础会话示例，保存原文档后成功导入外部文�
   const stream = new Writable({ write(chunk, _encoding, callback) { output += chunk.toString(); callback(); } });
   await new Repl(cli).run(Readable.from([readFileSync('examples/basic-session.cli', 'utf8')]), stream);
   assert.equal(cli.hadErrors, false, output);
-  const original = new SvgCodec().decode(files.read('demo.svg')).document;
+  const original = new SvgCodec(new ShapeFactory()).decode(files.read('demo.svg')).document;
   assert.equal(original.find('title').text, 'My Diagram');
   assert.equal(original.find('c1').attributes.cx, '130');
   assert.equal(original.parentLabel(original.find('box')), 'g#markers');
@@ -250,7 +251,7 @@ test('CLI 新建文档另存后不产生读入路径，无参数保存报错且�
   assert.deepEqual(cli.execute('save'), ["error: no read path. specify 'save <file.svg>'"]);
   assert.deepEqual(session.document, before);
   assert.equal(session.currentPath, undefined);
-  assert.equal(new SvgCodec().decode(files.read('created.svg')).document.find('r').attributes.x, '1');
+  assert.equal(new SvgCodec(new ShapeFactory()).decode(files.read('created.svg')).document.find('r').attributes.x, '1');
   assert.deepEqual(cli.execute('undo'), ['undone: move r']);
   assert.equal(session.document.find('r').attributes.x, '1');
 });

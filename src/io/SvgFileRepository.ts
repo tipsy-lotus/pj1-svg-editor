@@ -3,7 +3,7 @@ import type { FileStore } from './FileStore.js';
 import { SvgCodec } from './SvgCodec.js';
 
 export class SvgFileRepository {
-  constructor(private readonly files: FileStore, private readonly codec = new SvgCodec()) {}
+  constructor(private readonly files: FileStore, private readonly codec: SvgCodec) {}
 
   read(path: string): ReturnType<SvgCodec['decode']> {
     return this.codec.decode(this.files.read(path));
