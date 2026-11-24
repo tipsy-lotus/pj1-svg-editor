@@ -4,12 +4,12 @@ import { mkdirSync, mkdtempSync, readFileSync, readdirSync, rmSync, writeFileSyn
 import { basename, dirname, join, resolve } from 'node:path';
 import { NodeFileStore } from '../src/io/NodeFileStore.js';
 import { SvgCodec } from '../src/io/SvgCodec.js';
-import { SvgFileRepository } from '../src/io/SvgFileRepository.js';
+import { DefaultRepository as SvgFileRepository } from './support/DefaultRepository.js';
 import { Group } from '../src/model/Group.js';
-import { ShapeFactory } from '../src/model/ShapeFactory.js';
+import { DefaultShapes as ShapeFactory } from '../src/host/DefaultShapes.js';
 import { SvgDocument } from '../src/model/SvgDocument.js';
 
-const codec = new SvgCodec();
+const codec = new SvgCodec(new ShapeFactory());
 const factory = new ShapeFactory();
 const namespace = 'http://www.w3.org/2000/svg';
 

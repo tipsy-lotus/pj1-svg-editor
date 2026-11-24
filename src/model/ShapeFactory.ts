@@ -1,39 +1,46 @@
+import type { ShapeProvider } from '../extensions/ShapeProvider.js';
+import type { SvgShapeSource } from '../extensions/SvgShapeSource.js';
 import { Shape } from './Shape.js';
-import { Rect } from './Rect.js';
-import { Circle } from './Circle.js';
-import { Ellipse } from './Ellipse.js';
-import { Line } from './Line.js';
-import { Text } from './Text.js';
-import { Group } from './Group.js';
 
 export class ShapeFactory {
-  // Phase 1 name-dispatch boundary; replace with providers in the plugin phase.
-  private readonly types = new Map<string, { make: (id: string) => Shape; fields: string[]; optional?: string }>([
-    ['rect', { make: id => new Rect(id), fields: ['x', 'y', 'width', 'height'], optional: 'fill' }],
-    ['circle', { make: id => new Circle(id), fields: ['cx', 'cy', 'r'], optional: 'fill' }],
-    ['ellipse', { make: id => new Ellipse(id), fields: ['cx', 'cy', 'rx', 'ry'], optional: 'fill' }],
-    ['line', { make: id => new Line(id), fields: ['x1', 'y1', 'x2', 'y2'], optional: 'stroke' }],
-    ['text', { make: id => new Text(id), fields: ['x', 'y', 'text'] }],
-    ['g', { make: id => new Group(id), fields: [] }],
-  ]);
-  private definition(type: string) {
-    const definition = this.types.get(type);
-    if (!definition) throw new Error(`unknown shape type: ${type} (is the plugin loaded?)`);
-    return definition;
+  private readonly providers = new Map<string, ShapeProvider>();
+
+  register(provider: ShapeProvider): void {
+    if (this.providers.has(provider.name)) throw new Error(`duplicate registration: shapes/${provider.name}`);
+    if (!provider.name || !provider.help || !Number.isFinite(provider.svgPriority)
+      || typeof provider.create !== 'function' || typeof provider.read !== 'function'
+      || typeof provider.matchesSvg !== 'function') throw new Error('invalid shape provider');
+    this.providers.set(provider.name, provider);
   }
+
+  get help(): readonly string[] { return [...this.providers.values()].map(provider => provider.help); }
+
   create(type: string, id: string, params: readonly string[]): Shape {
-    const { make, fields, optional } = this.definition(type);
-    if (params.length < fields.length || params.length > fields.length + (optional ? 1 : 0)) {
-      throw new Error(`usage: create ${type} <id> ${fields.map(field => `<${field}>`).join(' ')}${optional ? ` [${optional}]` : ''} [in <containerId>]`);
-    }
-    const shape = make(id);
-    fields.forEach((field, index) => shape.set(field, params[index]!));
-    if (optional && params[fields.length] !== undefined) shape.set(optional, params[fields.length]!);
+    return this.validate(this.definition(type).create(id, params), id);
+  }
+
+  fromAttributes(type: string, id: string, attributes: Readonly<Record<string, string>>): Shape {
+    return this.validate(this.definition(type).read({ tag: type, id, attributes, children: [], text: '' }), id);
+  }
+
+  fromSvg(source: SvgShapeSource): Shape {
+    const candidates = [...this.providers.values()]
+      .filter(provider => provider.matchesSvg(source.tag, source.attributes))
+      .sort((left, right) => right.svgPriority - left.svgPriority);
+    const provider = candidates[0];
+    if (!provider) throw new Error(`unknown shape type: ${source.tag} (is the plugin loaded?)`);
+    if (candidates[1]?.svgPriority === provider.svgPriority) throw new Error(`ambiguous shape providers for <${source.tag}>`);
+    return this.validate(provider.read(source), source.id);
+  }
+
+  private validate(shape: Shape, id: string): Shape {
+    if (!(shape instanceof Shape) || shape.id !== id) throw new Error(`shape provider returned invalid shape: ${id}`);
     return shape;
   }
-  fromAttributes(type: string, id: string, attributes: Readonly<Record<string, string>>): Shape {
-    const shape = this.definition(type).make(id);
-    shape.importAttributes(attributes);
-    return shape;
+
+  private definition(type: string): ShapeProvider {
+    const provider = this.providers.get(type);
+    if (!provider) throw new Error(`unknown shape type: ${type} (is the plugin loaded?)`);
+    return provider;
   }
 }

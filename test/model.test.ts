@@ -2,7 +2,7 @@ import assert from 'node:assert/strict';
 import { test } from 'node:test';
 import { Group } from '../src/model/Group.js';
 import { Rect } from '../src/model/Rect.js';
-import { ShapeFactory } from '../src/model/ShapeFactory.js';
+import { DefaultShapes as ShapeFactory } from '../src/host/DefaultShapes.js';
 import { SvgDocument } from '../src/model/SvgDocument.js';
 import { Value } from '../src/model/Value.js';
 

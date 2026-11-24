@@ -1,9 +1,9 @@
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
 import { EditorSession } from '../src/application/EditorSession.js';
-import { CreateCommand } from '../src/commands/CreateCommand.js';
+import { DefaultCreateCommand as CreateCommand } from './support/DefaultCreateCommand.js';
 import { MoveCommand } from '../src/commands/MoveCommand.js';
-import { SvgFileRepository } from '../src/io/SvgFileRepository.js';
+import { DefaultRepository as SvgFileRepository } from './support/DefaultRepository.js';
 import { MemoryFileStore } from './support/MemoryFileStore.js';
 
 test('没有当前文档时，编辑、显示尺寸、保存及历史操作统一拒绝', () => {

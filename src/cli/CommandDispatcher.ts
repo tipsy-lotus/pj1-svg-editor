@@ -9,6 +9,7 @@ import { ScaleCommand } from '../commands/ScaleCommand.js';
 import { SetCommand } from '../commands/SetCommand.js';
 import { UngroupCommand } from '../commands/UngroupCommand.js';
 import { Value } from '../model/Value.js';
+import type { ShapeFactory } from '../model/ShapeFactory.js';
 import { ShapeFormatter } from './ShapeFormatter.js';
 import type { Token } from './Token.js';
 import { Tokenizer } from './Tokenizer.js';
@@ -21,7 +22,7 @@ export class CommandDispatcher {
   private closed = false;
   private errors = false;
 
-  constructor(private readonly session: EditorSession) {
+  constructor(private readonly session: EditorSession, private readonly factory: ShapeFactory) {
     this.define('init', 'init [w] [h]', 0, 2, args => session.init(
       args[0] ? Value.number(args[0].value) : 800, args[1] ? Value.number(args[1].value) : 600,
     ));
@@ -91,16 +92,14 @@ export class CommandDispatcher {
     } else if (parameters.at(-1)?.value === 'in' && !parameters.at(-1)!.quoted) {
       throw new Error('usage: create <type> <id> [params...] [in <containerId>]');
     }
-    return this.session.execute(new CreateCommand(args[0]!.value, args[1]!.value, parameters.map(token => token.value), parent));
+    return this.session.execute(new CreateCommand(this.factory, args[0]!.value, args[1]!.value, parameters.map(token => token.value), parent));
   }
 
   private help(): readonly string[] {
     return [
       ...[...this.commands.values()].map(command => command.syntax),
       '', 'Shape parameters:',
-      '  rect <id> <x> <y> <w> <h> [fill]', '  circle <id> <cx> <cy> <r> [fill]',
-      '  ellipse <id> <cx> <cy> <rx> <ry> [fill]', '  line <id> <x1> <y1> <x2> <y2> [stroke]',
-      '  text <id> <x> <y> "content"', '  g <id>',
+      ...this.factory.help,
       'All create commands accept [in <containerId>]. Use double quotes for spaces.',
       'Only whole lines starting with # are comments. EOF, quit or exit closes the editor.',
     ];

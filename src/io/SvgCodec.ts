@@ -1,13 +1,13 @@
 import { xml2js, type Element } from 'xml-js';
 import type { Shape } from '../model/Shape.js';
-import { ShapeFactory } from '../model/ShapeFactory.js';
+import type { ShapeFactory } from '../model/ShapeFactory.js';
 import { SvgDocument } from '../model/SvgDocument.js';
 import { Value } from '../model/Value.js';
 import { XmlSyntax } from './XmlSyntax.js';
 
 export class SvgCodec {
   private readonly namespace = 'http://www.w3.org/2000/svg';
-  private readonly factory = new ShapeFactory();
+  constructor(private readonly factory: ShapeFactory) {}
   private readonly numericAttributes = new Set([
     'x', 'y', 'width', 'height', 'cx', 'cy', 'r', 'rx', 'ry', 'x1', 'y1', 'x2', 'y2', 'stroke-width',
   ]);
@@ -65,20 +65,16 @@ export class SvgCodec {
       const normalized = Object.fromEntries(Object.entries(attributes).map(([name, value]) => [
         name, this.numericAttributes.has(name) ? String(this.length(value)) : value,
       ]));
-      const shape = this.factory.fromAttributes(tag, id, normalized);
+      const children: Shape[] = [];
       let text = '';
       for (const child of node.elements ?? []) {
-        if (child.type === 'element') shape.add(build(child, context));
+        if (child.type === 'element') children.push(build(child, context));
         else if (child.type === 'text' || child.type === 'cdata') {
           const value = String(child.text ?? child.cdata ?? '');
-          if (shape.isContainer) {
-            if (value.trim()) throw new Error(`invalid SVG: unexpected text in <${tag}>`);
-          } else text += value;
+          text += value;
         } else this.checkNonElement(child);
       }
-      if (shape.supportsText) shape.set('text', text);
-      else if (text.trim()) throw new Error(`invalid SVG: unexpected text in <${tag}>`);
-      return shape;
+      return this.factory.fromSvg({ tag, id, attributes: normalized, children, text });
     };
     for (const node of root.elements ?? []) {
       if (node.type === 'element') document.insert(build(node, namespaces));
