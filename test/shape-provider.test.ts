@@ -7,7 +7,7 @@ import { Rect } from '../src/model/Rect.js';
 import { SvgCodec } from '../src/io/SvgCodec.js';
 import { SvgFileRepository } from '../src/io/SvgFileRepository.js';
 import { EditorSession } from '../src/application/EditorSession.js';
-import { CommandDispatcher } from '../src/cli/CommandDispatcher.js';
+import { DefaultDispatcher as CommandDispatcher } from '../src/host/DefaultDispatcher.js';
 import { CreateCommand } from '../src/commands/CreateCommand.js';
 import { History } from '../src/commands/History.js';
 import { BuiltinShapesPlugin } from '../plugins/builtin-shapes/src/BuiltinShapesPlugin.js';

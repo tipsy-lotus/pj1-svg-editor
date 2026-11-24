@@ -1,5 +1,5 @@
 import { EditorSession } from './application/EditorSession.js';
-import { CommandDispatcher } from './cli/CommandDispatcher.js';
+import { DefaultDispatcher as CommandDispatcher } from './host/DefaultDispatcher.js';
 import { Repl } from './cli/Repl.js';
 import { NodeFileStore } from './io/NodeFileStore.js';
 import { SvgFileRepository } from './io/SvgFileRepository.js';

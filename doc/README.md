@@ -222,11 +222,14 @@ npm.cmd --prefix vscode-extension run test:in-process
 
 ## Phase 2 进展：CLI 图形扩展点
 
-本次先拆分图形名称分派，尚未达到“四个扩展点齐备”的节点。命令注册、属性处理器、树标签、统一加载与回滚、指标脚本仍待实现，`box`、`stats`、`dir` 也尚未接入。
+图形与命令名称分派已拆分，尚未达到“四个扩展点齐备”的节点。属性处理器、树标签、统一加载与回滚、指标脚本仍待实现，`box`、`stats`、`dir` 也尚未接入。
 
 | 扩展点 | 职责与调用位置 | 实现与缺省行为 | 契约错误 |
 | --- | --- | --- | --- |
-| `ShapeProvider` | `ShapeFactory.create/fromSvg` 调用创建和读回；`CommandDispatcher.help` 读取提供器文案 | `plugins/builtin-shapes` 注册六类；宿主 `DefaultShapes` 默认装配；空注册表能启动，但创建或读回未注册类型时报未知图形 | 重名拒绝；元数据/方法非法拒绝；最高读回优先级并列拒绝；返回类型或 id 错误拒绝；提供器抛错保留原文档及历史 |
+| `ShapeProvider` | `ShapeFactory.create/fromSvg` 调用创建和读回；`BuiltinCommandsPlugin.help` 读取提供器文案 | `plugins/builtin-shapes` 注册六类；宿主 `DefaultShapes` 默认装配；空注册表能启动，但创建或读回未注册类型时报未知图形 | 重名拒绝；元数据/方法非法拒绝；最高读回优先级并列拒绝；返回类型或 id 错误拒绝；提供器抛错保留原文档及历史 |
+| `Command` | `CommandDispatcher.execute` 查询注册表、校验插件声明的参数数量并调用 `run`；内置 help 从上下文读取注册集合 | `plugins/builtin-commands` 提供原有 21 个命令名（含 exit 别名），由宿主 `DefaultDispatcher` 装配；空注册表能启动，未注册命令报未知命令 | 重名或非法参数规则拒绝注册；非法返回值报错；执行异常转为 error 信息，后续命令仍可运行 |
+
+命令插件通过公开的 `CommandContext` 和 `EditorAccess` 接口使用会话、图形注册表、结构展示和关闭能力，不访问历史栈或仓库字段。`src/extensions/Command` 描述 CLI 调用；`src/commands/Command` 保留可撤销编辑事务，查询命令无需进入历史。
 
 依赖方向为：`main/host → 内核与插件`，`builtin-shapes → ShapeProvider 与公开领域类`，内核通过接口调用提供器，不反向导入插件或宿主。创建、读回共用注册表。读回先完成子树解析，再由提供器构造完整对象；优先级与降级决策见 [ADR 001](adr/001-shape-provider.md)。当前内置插件入口仍是直接代码装配，后续接入统一加载事务，尚不声称已满足配置装配要求。
 
@@ -238,7 +241,7 @@ npm.cmd run test:in-process
 & ./scripts/check-phase1.ps1
 ```
 
-CLI 测试共 103 项通过：保留原有 95 项行为断言，新增 8 项图形扩展点测试。测试中的默认仓库、创建命令与分发器由 `test/support/Default*.ts` 显式装配，避免内核为兼容旧构造方式而重新依赖默认插件。
+CLI 测试共 107 项通过：保留原有 95 项行为断言，新增 8 项图形扩展点与 4 项命令扩展点测试。测试中的默认仓库、创建命令与分发器由 `test/support/Default*.ts` 显式装配，避免内核为兼容旧构造方式而重新依赖默认插件。
 
 回放脚本从 `final` 取出源码进行构建，在 `.cache/shape-compatibility/` 的两份独立工作目录运行真实 CLI 入口。相同输入包含 help、基础会话和流程图会话，输出逐字节一致；生成的 `demo.svg` 与 `flowchart.svg` 也逐字节一致。原有命令脚本只有命令和注释，不含提示符或示例输出。日志与临时产物不提交。
 
