@@ -4,6 +4,7 @@ import type { EditorAccess } from '../extensions/EditorAccess.js';
 import type { ShapeFactory } from '../model/ShapeFactory.js';
 import { ShapeFormatter } from './ShapeFormatter.js';
 import { Tokenizer } from './Tokenizer.js';
+import { AttributeRegistry } from '../extensions/AttributeRegistry.js';
 
 export class CommandDispatcher {
   private readonly registered = new Map<string, Command>();
@@ -13,9 +14,9 @@ export class CommandDispatcher {
   private errors = false;
   readonly context: CommandContext;
 
-  constructor(session: EditorAccess, shapes: ShapeFactory) {
+  constructor(session: EditorAccess, shapes: ShapeFactory, attributes = new AttributeRegistry()) {
     this.context = {
-      session, shapes,
+      session, shapes, attributes,
       registerCommand: command => this.register(command),
       commands: () => [...this.registered.values()],
       tree: (document, id) => this.formatter.tree(document, id),

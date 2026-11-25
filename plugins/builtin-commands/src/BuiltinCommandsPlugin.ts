@@ -33,7 +33,7 @@ export class BuiltinCommandsPlugin {
       args[0]!.value, Value.number(args[1]!.value), Value.number(args[2]!.value),
     )));
     define('scale', 'scale <id> <factor>', 2, 2, args => session.execute(new ScaleCommand(args[0]!.value, Value.number(args[1]!.value))));
-    define('set', 'set <id> <attr> <value>', 3, 3, args => session.execute(new SetCommand(args[0]!.value, args[1]!.value, args[2]!.value)));
+    define('set', 'set <id> <attr> <value>', 3, 3, args => session.execute(new SetCommand(args[0]!.value, args[1]!.value, args[2]!.value, context.attributes)));
     define('group', 'group <newGid> <id1> [id2...]', 2, Infinity, args => session.execute(new GroupCommand(args[0]!.value, args.slice(1).map(token => token.value))));
     define('ungroup', 'ungroup <gid>', 1, 1, args => session.execute(new UngroupCommand(args[0]!.value)));
     define('addto', 'addto <gid> <id>', 2, 2, args => session.execute(new AddToCommand(args[0]!.value, args[1]!.value)));
