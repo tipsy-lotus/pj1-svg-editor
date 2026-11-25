@@ -1,17 +1,17 @@
 # CLI 重构指标（脚本生成）
 
 基线：final (ce4e37a49d1d3527ea680358810e37cb99f7b654)
-目标：HEAD (a8cd7a1dbb26efbbcb39eae03c4ab271599a470a)
+目标：HEAD (a8373116e6c3ffd480d0e498da20b656654e9d7d)
 
 当前是阶段快照；收尾必须用 final 与 p2 再生成。统计来自已提交的 Git 快照，不包含工作区未提交内容。
 
 | 分类 | 基线文件 / 行数 / CC | 目标文件 / 行数 / CC | 行数增量 | CC 增量 |
 | --- | --- | --- | --- | --- |
-| kernel | 33 / 987 / 403 | 46 / 1128 / 427 | 141 | 24 |
+| kernel | 33 / 987 / 403 | 46 / 1150 / 436 | 163 | 33 |
 | assembly | 1 / 16 / 5 | 6 / 241 / 107 | 225 | 102 |
 | plugins | 0 / 0 / 0 | 4 / 144 / 61 | 144 | 61 |
 | vscode | 0 / 0 / 0 | 6 / 158 / 37 | 158 | 37 |
-| CLI 合计（不含 VSCode） | 34 / 1003 / 408 | 56 / 1513 / 595 | 510 | 187 |
+| CLI 合计（不含 VSCode） | 34 / 1003 / 408 | 56 / 1535 / 604 | 532 | 196 |
 
 kernel=内核，assembly=装配处，plugins=CLI 插件；vscode 单独列出，不计入 CLI 重构增量。
 
@@ -29,10 +29,10 @@ AST 解析器固定为 typescript-analysis（TypeScript 6.0.3），与项目 Typ
 | plugins/builtin-commands/src/RegisteredCommand.ts | plugins | 插件包 builtin-commands | 13 | 2 |
 | plugins/builtin-shapes/src/BuiltinShapeProvider.ts | plugins | 插件包 builtin-shapes | 32 | 15 |
 | plugins/builtin-shapes/src/BuiltinShapesPlugin.ts | plugins | 插件包 builtin-shapes | 24 | 8 |
-| src/application/EditorSession.ts | kernel | 文档会话 | 52 | 17 |
-| src/cli/CommandDispatcher.ts | kernel | 分词、分派与结构展示 | 66 | 33 |
+| src/application/EditorSession.ts | kernel | 文档会话 | 58 | 18 |
+| src/cli/CommandDispatcher.ts | kernel | 分词、分派与结构展示 | 66 | 34 |
 | src/cli/Repl.ts | kernel | 分词、分派与结构展示 | 25 | 10 |
-| src/cli/ShapeFormatter.ts | kernel | 分词、分派与结构展示 | 39 | 18 |
+| src/cli/ShapeFormatter.ts | kernel | 分词、分派与结构展示 | 41 | 19 |
 | src/cli/Token.ts | kernel | 分词、分派与结构展示 | 3 | 1 |
 | src/cli/Tokenizer.ts | kernel | 分词、分派与结构展示 | 35 | 19 |
 | src/commands/AddToCommand.ts | kernel | 可撤销编辑事务与历史 | 9 | 2 |
@@ -52,12 +52,12 @@ AST 解析器固定为 typescript-analysis（TypeScript 6.0.3），与项目 Typ
 | src/extensions/AttributeRegistry.ts | kernel | 公开扩展契约与注册表 | 32 | 17 |
 | src/extensions/Command.ts | kernel | 公开扩展契约与注册表 | 10 | 0 |
 | src/extensions/CommandContext.ts | kernel | 公开扩展契约与注册表 | 16 | 0 |
-| src/extensions/EditorAccess.ts | kernel | 公开扩展契约与注册表 | 15 | 0 |
+| src/extensions/EditorAccess.ts | kernel | 公开扩展契约与注册表 | 16 | 0 |
 | src/extensions/Plugin.ts | kernel | 公开扩展契约与注册表 | 5 | 0 |
 | src/extensions/PluginContext.ts | kernel | 公开扩展契约与注册表 | 10 | 0 |
 | src/extensions/ShapeProvider.ts | kernel | 公开扩展契约与注册表 | 14 | 0 |
 | src/extensions/SvgShapeSource.ts | kernel | 公开扩展契约与注册表 | 10 | 0 |
-| src/extensions/TreeContext.ts | kernel | 公开扩展契约与注册表 | 8 | 0 |
+| src/extensions/TreeContext.ts | kernel | 公开扩展契约与注册表 | 10 | 0 |
 | src/extensions/TreeDecorator.ts | kernel | 公开扩展契约与注册表 | 7 | 0 |
 | src/extensions/TreeDecoratorRegistry.ts | kernel | 公开扩展契约与注册表 | 26 | 16 |
 | src/host/DefaultDispatcher.ts | assembly | 装配、激活事务与模块加载 | 13 | 1 |
@@ -73,12 +73,12 @@ AST 解析器固定为 typescript-analysis（TypeScript 6.0.3），与项目 Typ
 | src/main.ts | assembly | CLI 启动组合根 | 38 | 11 |
 | src/model/Circle.ts | kernel | 图形、容器、文档与图形注册 | 6 | 2 |
 | src/model/Ellipse.ts | kernel | 图形、容器、文档与图形注册 | 6 | 2 |
-| src/model/Group.ts | kernel | 图形、容器、文档与图形注册 | 35 | 21 |
+| src/model/Group.ts | kernel | 图形、容器、文档与图形注册 | 36 | 21 |
 | src/model/Line.ts | kernel | 图形、容器、文档与图形注册 | 6 | 2 |
 | src/model/Rect.ts | kernel | 图形、容器、文档与图形注册 | 6 | 2 |
-| src/model/Shape.ts | kernel | 图形、容器、文档与图形注册 | 75 | 32 |
+| src/model/Shape.ts | kernel | 图形、容器、文档与图形注册 | 80 | 36 |
 | src/model/ShapeFactory.ts | kernel | 图形、容器、文档与图形注册 | 51 | 26 |
-| src/model/SvgDocument.ts | kernel | 图形、容器、文档与图形注册 | 116 | 56 |
+| src/model/SvgDocument.ts | kernel | 图形、容器、文档与图形注册 | 121 | 58 |
 | src/model/Text.ts | kernel | 图形、容器、文档与图形注册 | 7 | 3 |
 | src/model/Value.ts | kernel | 图形、容器、文档与图形注册 | 29 | 13 |
 | vscode-extension/src/extension.ts | vscode | VSCode 文件标记与大纲 | 32 | 5 |

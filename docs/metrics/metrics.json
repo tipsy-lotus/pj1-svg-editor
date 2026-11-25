@@ -2,7 +2,7 @@
   "baseRef": "final",
   "targetRef": "HEAD",
   "baseCommit": "ce4e37a49d1d3527ea680358810e37cb99f7b654",
-  "targetCommit": "a8cd7a1dbb26efbbcb39eae03c4ab271599a470a",
+  "targetCommit": "a8373116e6c3ffd480d0e498da20b656654e9d7d",
   "forbiddenStaticDependencies": [],
   "base": [
     {
@@ -1515,48 +1515,52 @@
       "path": "src/application/EditorSession.ts",
       "category": "kernel",
       "responsibility": "文档会话",
-      "lines": 52,
-      "functions": 10,
-      "complexity": 17,
+      "lines": 58,
+      "functions": 11,
+      "complexity": 18,
       "units": [
         {
-          "line": 11,
+          "line": 12,
           "complexity": 1
         },
         {
-          "line": 13,
+          "line": 14,
           "complexity": 2
         },
         {
-          "line": 18,
+          "line": 19,
           "complexity": 1
         },
         {
-          "line": 20,
+          "line": 21,
           "complexity": 1
         },
         {
-          "line": 26,
+          "line": 23,
           "complexity": 1
         },
         {
-          "line": 32,
+          "line": 29,
+          "complexity": 1
+        },
+        {
+          "line": 36,
           "complexity": 3
         },
         {
-          "line": 41,
+          "line": 47,
           "complexity": 5
         },
         {
-          "line": 49,
+          "line": 55,
           "complexity": 1
         },
         {
-          "line": 50,
+          "line": 56,
           "complexity": 1
         },
         {
-          "line": 51,
+          "line": 57,
           "complexity": 1
         }
       ],
@@ -1572,8 +1576,8 @@
       "category": "kernel",
       "responsibility": "分词、分派与结构展示",
       "lines": 66,
-      "functions": 14,
-      "complexity": 33,
+      "functions": 15,
+      "complexity": 34,
       "units": [
         {
           "line": 12,
@@ -1589,6 +1593,10 @@
         },
         {
           "line": 22,
+          "complexity": 1
+        },
+        {
+          "line": 23,
           "complexity": 1
         },
         {
@@ -1678,9 +1686,9 @@
       "path": "src/cli/ShapeFormatter.ts",
       "category": "kernel",
       "responsibility": "分词、分派与结构展示",
-      "lines": 39,
-      "functions": 8,
-      "complexity": 18,
+      "lines": 41,
+      "functions": 9,
+      "complexity": 19,
       "units": [
         {
           "line": 6,
@@ -1688,30 +1696,34 @@
         },
         {
           "line": 7,
+          "complexity": 1
+        },
+        {
+          "line": 8,
           "complexity": 4
         },
         {
-          "line": 11,
+          "line": 13,
           "complexity": 1
         },
         {
-          "line": 12,
+          "line": 14,
           "complexity": 3
         },
         {
-          "line": 22,
+          "line": 24,
           "complexity": 3
         },
         {
-          "line": 31,
+          "line": 33,
           "complexity": 3
         },
         {
-          "line": 36,
+          "line": 38,
           "complexity": 1
         },
         {
-          "line": 37,
+          "line": 39,
           "complexity": 2
         }
       ],
@@ -2125,7 +2137,7 @@
       "path": "src/extensions/EditorAccess.ts",
       "category": "kernel",
       "responsibility": "公开扩展契约与注册表",
-      "lines": 15,
+      "lines": 16,
       "functions": 0,
       "complexity": 0,
       "units": [],
@@ -2190,7 +2202,7 @@
       "path": "src/extensions/TreeContext.ts",
       "category": "kernel",
       "responsibility": "公开扩展契约与注册表",
-      "lines": 8,
+      "lines": 10,
       "functions": 0,
       "complexity": 0,
       "units": [],
@@ -2743,7 +2755,7 @@
       "path": "src/model/Group.ts",
       "category": "kernel",
       "responsibility": "图形、容器、文档与图形注册",
-      "lines": 35,
+      "lines": 36,
       "functions": 10,
       "complexity": 21,
       "units": [
@@ -2768,23 +2780,23 @@
           "complexity": 2
         },
         {
-          "line": 19,
+          "line": 20,
           "complexity": 2
         },
         {
-          "line": 23,
+          "line": 24,
           "complexity": 2
         },
         {
-          "line": 27,
+          "line": 28,
           "complexity": 2
-        },
-        {
-          "line": 32,
-          "complexity": 1
         },
         {
           "line": 33,
+          "complexity": 1
+        },
+        {
+          "line": 34,
           "complexity": 2
         }
       ],
@@ -2838,9 +2850,9 @@
       "path": "src/model/Shape.ts",
       "category": "kernel",
       "responsibility": "图形、容器、文档与图形注册",
-      "lines": 75,
-      "functions": 15,
-      "complexity": 32,
+      "lines": 80,
+      "functions": 19,
+      "complexity": 36,
       "units": [
         {
           "line": 8,
@@ -2871,28 +2883,28 @@
           "complexity": 1
         },
         {
+          "line": 25,
+          "complexity": 1
+        },
+        {
           "line": 26,
+          "complexity": 1
+        },
+        {
+          "line": 28,
           "complexity": 10
         },
         {
-          "line": 47,
+          "line": 49,
           "complexity": 5
         },
         {
-          "line": 55,
+          "line": 57,
           "complexity": 3
         },
         {
-          "line": 61,
+          "line": 63,
           "complexity": 2
-        },
-        {
-          "line": 66,
-          "complexity": 1
-        },
-        {
-          "line": 67,
-          "complexity": 1
         },
         {
           "line": 68,
@@ -2900,6 +2912,22 @@
         },
         {
           "line": 69,
+          "complexity": 1
+        },
+        {
+          "line": 71,
+          "complexity": 1
+        },
+        {
+          "line": 72,
+          "complexity": 1
+        },
+        {
+          "line": 73,
+          "complexity": 1
+        },
+        {
+          "line": 74,
           "complexity": 1
         }
       ],
@@ -2982,9 +3010,9 @@
       "path": "src/model/SvgDocument.ts",
       "category": "kernel",
       "responsibility": "图形、容器、文档与图形注册",
-      "lines": 116,
-      "functions": 33,
-      "complexity": 56,
+      "lines": 121,
+      "functions": 35,
+      "complexity": 58,
       "units": [
         {
           "line": 10,
@@ -3095,27 +3123,35 @@
           "complexity": 1
         },
         {
-          "line": 88,
-          "complexity": 2
-        },
-        {
-          "line": 94,
+          "line": 85,
           "complexity": 1
         },
         {
-          "line": 96,
+          "line": 90,
+          "complexity": 2
+        },
+        {
+          "line": 97,
+          "complexity": 1
+        },
+        {
+          "line": 99,
+          "complexity": 1
+        },
+        {
+          "line": 101,
           "complexity": 3
         },
         {
-          "line": 102,
+          "line": 107,
           "complexity": 2
         },
         {
-          "line": 106,
+          "line": 111,
           "complexity": 1
         },
         {
-          "line": 111,
+          "line": 116,
           "complexity": 1
         }
       ],
