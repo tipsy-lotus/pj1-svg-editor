@@ -222,7 +222,7 @@ npm.cmd --prefix vscode-extension run test:in-process
 
 ## Phase 2 进展：CLI 扩展点
 
-四个扩展点的接口、注册与调用链及宿主整包注册事务已接通，但实际可选插件、动态配置加载和指标脚本尚未齐备，因此“框架可扩展”节点仍未全部验收完成。`box`、`stats`、`dir`、`modified-star` 与 `(box)` 标签均待接入。
+四个扩展点、宿主整包注册事务和动态配置加载已接通，但实际可选插件和指标脚本尚未齐备，因此“框架可扩展”节点仍未全部验收完成。`box`、`stats`、`dir`、`modified-star` 与 `(box)` 标签均待接入。
 
 | 扩展点 | 职责与调用位置 | 实现与缺省行为 | 契约错误 |
 | --- | --- | --- | --- |
@@ -239,7 +239,23 @@ npm.cmd --prefix vscode-extension run test:in-process
 
 依赖方向为：`main/host → 内核与插件`，`builtin-shapes → ShapeProvider 与公开领域类`，内核通过接口调用提供器，不反向导入插件或宿主。创建、读回共用注册表。读回先完成子树解析，再由提供器构造完整对象；优先级与降级决策见 [ADR 001](adr/001-shape-provider.md)。
 
-真实 CLI 入口通过 `PluginHost.activate` 进行代码装配，内置插件读取各自 package.json 清单。四类贡献先暂存，激活完成后按类别和名称集合校验，通过后一起发布；重名、清单不符或激活失败均丢弃当前插件贡献，保留已有成功插件。异步激活与并发请求按顺序处理，options 原样传入，激活结束后禁止追加注册。详细边界见 [ADR 003](adr/003-plugin-registration.md)。配置解析、模块查找及默认导出检查尚未实现。
+真实 CLI 入口通过 `PluginHost.activate` 进行代码装配，内置插件读取各自 package.json 清单。四类贡献先暂存，激活完成后按类别和名称集合校验，通过后一起发布；重名、清单不符或激活失败均丢弃当前插件贡献，保留已有成功插件。异步激活与并发请求按顺序处理，options 原样传入，激活结束后禁止追加注册。详细边界见 [ADR 003](adr/003-plugin-registration.md)。
+
+### 配置装配
+
+默认启动使用代码装配的内置能力；显式指定配置后，按数组顺序追加可选插件：
+
+```powershell
+npm.cmd run cli -- --config plugins.config.json
+```
+
+根目录配置当前是 `{ "plugins": [] }`，保持原有能力。每项包含字符串 module、可选布尔 enabled 和任意 options；`enabled: false` 完全跳过解析与导入。配置先整体检查，语法或结构错误输出 `error: invalid plugin config`，不加载其中任何条目，继续提供默认内置能力。
+
+相对路径以配置文件目录为基准，支持文件入口或带 package.json 的目录；包名通过 Node `createRequire(configFile).resolve` 解析，采用该 API 的 main/exports require 条件，然后动态 import 已解析入口。插件应声明可解析的 JavaScript 入口（TypeScript 源码先构建），入口导出实现 activate 的默认实例。目录请求读取该目录的 package.json，文件/包入口查找最近的 package.json 清单。加载器不按插件名称映射或导入具体实现。
+
+顶层模块不存在报 `error: plugin not found: <module>`，无默认导出报 `error: plugin has no default export: <module>`；入口损坏、依赖缺失、求值异常或非法默认实例报激活失败，不误报顶层模块不存在。其余清单不符、重复注册和激活异常由同一个 PluginHost 处理。诊断写入 stderr，随后仍进入 CLI；CLI 命令自身的退出码规则保留。
+
+已用临时测试插件验证代码/配置装配输出逐字节一致、配置目录路径和包名解析，以及四条失败路径、重复注册回滚、禁用、options 和配置整体预检。实际 stats、dir、box 会话与固定目录的双装配验证尚未完成，不能用此测试替代最终验收。
 
 验证命令：
 
@@ -249,7 +265,7 @@ npm.cmd run test:in-process
 & ./scripts/check-phase1.ps1
 ```
 
-CLI 测试共 125 项通过：保留原有 95 项行为断言，新增 8 项图形、4 项命令、5 项属性、6 项树标签及 7 项宿主注册事务测试。测试中的默认仓库、创建命令与分发器由 `test/support/Default*.ts` 显式装配，避免内核为兼容旧构造方式而重新依赖默认插件。
+CLI 测试共 133 项通过：保留原有 95 项行为断言，新增 8 项图形、4 项命令、5 项属性、6 项树标签、7 项宿主事务及 8 项加载器测试。测试中的默认仓库、创建命令与分发器由 `test/support/Default*.ts` 显式装配，避免内核为兼容旧构造方式而重新依赖默认插件。
 
 回放脚本从 `final` 取出源码进行构建，在 `.cache/shape-compatibility/` 的两份独立工作目录运行真实 CLI 入口。相同输入包含 help、基础会话和流程图会话，输出逐字节一致；生成的 `demo.svg` 与 `flowchart.svg` 也逐字节一致。原有命令脚本只有命令和注释，不含提示符或示例输出。日志与临时产物不提交。
 
