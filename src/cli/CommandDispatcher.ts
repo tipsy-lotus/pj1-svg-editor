@@ -5,16 +5,18 @@ import type { ShapeFactory } from '../model/ShapeFactory.js';
 import { ShapeFormatter } from './ShapeFormatter.js';
 import { Tokenizer } from './Tokenizer.js';
 import { AttributeRegistry } from '../extensions/AttributeRegistry.js';
+import { TreeDecoratorRegistry } from '../extensions/TreeDecoratorRegistry.js';
 
 export class CommandDispatcher {
   private readonly registered = new Map<string, Command>();
   private readonly tokenizer = new Tokenizer();
-  private readonly formatter = new ShapeFormatter();
+  private readonly formatter: ShapeFormatter;
   private closed = false;
   private errors = false;
   readonly context: CommandContext;
 
-  constructor(session: EditorAccess, shapes: ShapeFactory, attributes = new AttributeRegistry()) {
+  constructor(session: EditorAccess, shapes: ShapeFactory, attributes = new AttributeRegistry(), decorators = new TreeDecoratorRegistry()) {
+    this.formatter = new ShapeFormatter(decorators);
     this.context = {
       session, shapes, attributes,
       registerCommand: command => this.register(command),

@@ -220,19 +220,22 @@ npm.cmd --prefix vscode-extension run test:in-process
 | 大纲排查 | 根据实际反馈补充当前文本文件、匹配状态和解析结果的诊断；启动时自动打开示例，并在示例工作区指定 SVG 使用文本编辑器 | 调整后，我确认大纲能够显示和定位；原先未显示的具体原因未完全确认 |
 | 异常与恢复 | 建议将编辑更新、不完整 XML 和恢复分开留证 | 我验证未保存编辑也会更新；删除 `</svg>` 后本扩展大纲清空，恢复后节点重新出现，随后恢复并保存原示例 |
 
-## Phase 2 进展：CLI 图形扩展点
+## Phase 2 进展：CLI 扩展点
 
-图形、命令和属性处理三个扩展点已接通，尚未达到“四个扩展点齐备”的节点。树标签、统一加载与回滚、指标脚本仍待实现，`box`、`stats`、`dir` 也尚未接入。
+四个扩展点的接口、注册与调用链已接通，但实际可选插件、统一加载与整包回滚、指标脚本尚未齐备，因此“框架可扩展”节点仍未全部验收完成。`box`、`stats`、`dir`、`modified-star` 与 `(box)` 标签均待接入。
 
 | 扩展点 | 职责与调用位置 | 实现与缺省行为 | 契约错误 |
 | --- | --- | --- | --- |
 | `ShapeProvider` | `ShapeFactory.create/fromSvg` 调用创建和读回；`BuiltinCommandsPlugin.help` 读取提供器文案 | `plugins/builtin-shapes` 注册六类；宿主 `DefaultShapes` 默认装配；空注册表能启动，但创建或读回未注册类型时报未知图形 | 重名拒绝；元数据/方法非法拒绝；最高读回优先级并列拒绝；返回类型或 id 错误拒绝；提供器抛错保留原文档及历史 |
 | `Command` | `CommandDispatcher.execute` 查询注册表、校验插件声明的参数数量并调用 `run`；内置 help 从上下文读取注册集合 | `plugins/builtin-commands` 提供原有 21 个命令名（含 exit 别名），由宿主 `DefaultDispatcher` 装配；空注册表能启动，未注册命令报未知命令 | 重名或非法参数规则拒绝注册；非法返回值报错；执行异常转为 error 信息，后续命令仍可运行 |
 | `AttributeHandler` | `SetCommand.apply → AttributeRegistry.apply` 定位目标、检查命中并执行处理器 | 当前以独立类替身验证，实际 box 处理器待接入；缺省空注册表使用 Phase 1 白名单 | 同名或非法注册拒绝；多个命中拒绝；判断或应用抛错时文档与历史恢复，不回退默认处理 |
+| `TreeDecorator` | `ShapeFormatter.tree → TreeDecoratorRegistry.suffix` 为根行、子树首行及后代行生成后缀 | 当前以独立类替身验证，实际标签插件待接入；缺省不追加任何字符，show 不受影响 | 同名或非法注册拒绝；非字符串或含换行/制表符的标签拒绝；异常交由 CLI 输出 error，不返回半棵树 |
 
 命令插件通过公开的 `CommandContext` 和 `EditorAccess` 接口使用会话、图形注册表、结构展示和关闭能力，不访问历史栈或仓库字段。`src/extensions/Command` 描述 CLI 调用；`src/commands/Command` 保留可撤销编辑事务，查询命令无需进入历史。
 
 属性处理器通过 `AttributeContext` 使用公开领域方法，整条调用包在一个 `SetCommand` 快照事务中；即使改动多个子部件，也能一次撤销或重做。冲突统一拒绝，部分失败整体恢复；具体约定见 [ADR 002](adr/002-attribute-handler.md)。
+
+树标签通过 `TreeContext` 接收当前文档与当前图形，SVG 根行的图形为 undefined，指定子树的首行则传入该图形。标签只能读取文档，自身状态放在实例字段内。多个标签按注册顺序以一个空格连接；undefined、空串或纯空白不追加后缀，标签首尾空白被去除。渲染失败不会输出部分树；框架不提供对任意插件副作用的沙箱隔离。dirty 判定、祖先传播和保存点观察能力将在实际标签插件接入前确定并验证。
 
 依赖方向为：`main/host → 内核与插件`，`builtin-shapes → ShapeProvider 与公开领域类`，内核通过接口调用提供器，不反向导入插件或宿主。创建、读回共用注册表。读回先完成子树解析，再由提供器构造完整对象；优先级与降级决策见 [ADR 001](adr/001-shape-provider.md)。当前内置插件入口仍是直接代码装配，后续接入统一加载事务，尚不声称已满足配置装配要求。
 
@@ -244,7 +247,7 @@ npm.cmd run test:in-process
 & ./scripts/check-phase1.ps1
 ```
 
-CLI 测试共 112 项通过：保留原有 95 项行为断言，新增 8 项图形、4 项命令和 5 项属性扩展点测试。测试中的默认仓库、创建命令与分发器由 `test/support/Default*.ts` 显式装配，避免内核为兼容旧构造方式而重新依赖默认插件。
+CLI 测试共 118 项通过：保留原有 95 项行为断言，新增 8 项图形、4 项命令、5 项属性及 6 项树标签扩展点测试。测试中的默认仓库、创建命令与分发器由 `test/support/Default*.ts` 显式装配，避免内核为兼容旧构造方式而重新依赖默认插件。
 
 回放脚本从 `final` 取出源码进行构建，在 `.cache/shape-compatibility/` 的两份独立工作目录运行真实 CLI 入口。相同输入包含 help、基础会话和流程图会话，输出逐字节一致；生成的 `demo.svg` 与 `flowchart.svg` 也逐字节一致。原有命令脚本只有命令和注释，不含提示符或示例输出。日志与临时产物不提交。
 

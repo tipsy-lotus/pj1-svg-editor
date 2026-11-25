@@ -1,14 +1,17 @@
 import type { Shape } from '../model/Shape.js';
 import type { SvgDocument } from '../model/SvgDocument.js';
+import { TreeDecoratorRegistry } from '../extensions/TreeDecoratorRegistry.js';
 
 export class ShapeFormatter {
+  constructor(private readonly decorators = new TreeDecoratorRegistry()) {}
   tree(document: SvgDocument, id?: string): string {
     const root = id === undefined ? undefined : document.find(id);
-    const lines = [root ? this.inline(root) : `svg (${document.width}x${document.height})`];
+    const lines = [(root ? this.inline(root) : `svg (${document.width}x${document.height})`)
+      + this.decorators.suffix({ document, shape: root })];
     const visit = (children: readonly Shape[], prefix: string): void => {
       children.forEach((shape, index) => {
         const last = index === children.length - 1;
-        lines.push(`${prefix}${last ? '└── ' : '├── '}${this.inline(shape)}`);
+        lines.push(`${prefix}${last ? '└── ' : '├── '}${this.inline(shape)}${this.decorators.suffix({ document, shape })}`);
         visit(shape.children, prefix + (last ? '    ' : '│   '));
       });
     };
