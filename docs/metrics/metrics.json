@@ -1,0 +1,3344 @@
+{
+  "baseRef": "final",
+  "targetRef": "HEAD",
+  "baseCommit": "ce4e37a49d1d3527ea680358810e37cb99f7b654",
+  "targetCommit": "a8cd7a1dbb26efbbcb39eae03c4ab271599a470a",
+  "forbiddenStaticDependencies": [],
+  "base": [
+    {
+      "path": "src/application/EditorSession.ts",
+      "category": "kernel",
+      "responsibility": "文档会话",
+      "lines": 52,
+      "functions": 10,
+      "complexity": 17,
+      "units": [
+        {
+          "line": 11,
+          "complexity": 1
+        },
+        {
+          "line": 13,
+          "complexity": 2
+        },
+        {
+          "line": 18,
+          "complexity": 1
+        },
+        {
+          "line": 20,
+          "complexity": 1
+        },
+        {
+          "line": 26,
+          "complexity": 1
+        },
+        {
+          "line": 32,
+          "complexity": 3
+        },
+        {
+          "line": 41,
+          "complexity": 5
+        },
+        {
+          "line": 49,
+          "complexity": 1
+        },
+        {
+          "line": 50,
+          "complexity": 1
+        },
+        {
+          "line": 51,
+          "complexity": 1
+        }
+      ],
+      "imports": [
+        "../commands/Command.js",
+        "../commands/History.js",
+        "../io/SvgFileRepository.js",
+        "../model/SvgDocument.js"
+      ]
+    },
+    {
+      "path": "src/cli/CommandDispatcher.ts",
+      "category": "kernel",
+      "responsibility": "分词、分派与结构展示",
+      "lines": 108,
+      "functions": 32,
+      "complexity": 48,
+      "units": [
+        {
+          "line": 24,
+          "complexity": 1
+        },
+        {
+          "line": 25,
+          "complexity": 3
+        },
+        {
+          "line": 28,
+          "complexity": 1
+        },
+        {
+          "line": 29,
+          "complexity": 1
+        },
+        {
+          "line": 30,
+          "complexity": 3
+        },
+        {
+          "line": 34,
+          "complexity": 1
+        },
+        {
+          "line": 35,
+          "complexity": 1
+        },
+        {
+          "line": 36,
+          "complexity": 1
+        },
+        {
+          "line": 39,
+          "complexity": 1
+        },
+        {
+          "line": 40,
+          "complexity": 1
+        },
+        {
+          "line": 41,
+          "complexity": 1
+        },
+        {
+          "line": 41,
+          "complexity": 1
+        },
+        {
+          "line": 42,
+          "complexity": 1
+        },
+        {
+          "line": 43,
+          "complexity": 1
+        },
+        {
+          "line": 44,
+          "complexity": 1
+        },
+        {
+          "line": 45,
+          "complexity": 1
+        },
+        {
+          "line": 46,
+          "complexity": 1
+        },
+        {
+          "line": 47,
+          "complexity": 1
+        },
+        {
+          "line": 48,
+          "complexity": 1
+        },
+        {
+          "line": 49,
+          "complexity": 1
+        },
+        {
+          "line": 50,
+          "complexity": 1
+        },
+        {
+          "line": 51,
+          "complexity": 1
+        },
+        {
+          "line": 52,
+          "complexity": 1
+        },
+        {
+          "line": 55,
+          "complexity": 1
+        },
+        {
+          "line": 56,
+          "complexity": 1
+        },
+        {
+          "line": 58,
+          "complexity": 6
+        },
+        {
+          "line": 73,
+          "complexity": 1
+        },
+        {
+          "line": 76,
+          "complexity": 4
+        },
+        {
+          "line": 84,
+          "complexity": 5
+        },
+        {
+          "line": 94,
+          "complexity": 1
+        },
+        {
+          "line": 97,
+          "complexity": 1
+        },
+        {
+          "line": 99,
+          "complexity": 1
+        }
+      ],
+      "imports": [
+        "../application/EditorSession.js",
+        "../commands/AddToCommand.js",
+        "../commands/CreateCommand.js",
+        "../commands/DeleteCommand.js",
+        "../commands/GroupCommand.js",
+        "../commands/MoveCommand.js",
+        "../commands/ReorderCommand.js",
+        "../commands/ScaleCommand.js",
+        "../commands/SetCommand.js",
+        "../commands/UngroupCommand.js",
+        "../model/Value.js",
+        "./ShapeFormatter.js",
+        "./Token.js",
+        "./Tokenizer.js"
+      ]
+    },
+    {
+      "path": "src/cli/Repl.ts",
+      "category": "kernel",
+      "responsibility": "分词、分派与结构展示",
+      "lines": 25,
+      "functions": 4,
+      "complexity": 10,
+      "units": [
+        {
+          "line": 6,
+          "complexity": 1
+        },
+        {
+          "line": 8,
+          "complexity": 7
+        },
+        {
+          "line": 11,
+          "complexity": 1
+        },
+        {
+          "line": 12,
+          "complexity": 1
+        }
+      ],
+      "imports": [
+        "node:readline",
+        "node:stream",
+        "./CommandDispatcher.js"
+      ]
+    },
+    {
+      "path": "src/cli/ShapeFormatter.ts",
+      "category": "kernel",
+      "responsibility": "分词、分派与结构展示",
+      "lines": 36,
+      "functions": 7,
+      "complexity": 17,
+      "units": [
+        {
+          "line": 5,
+          "complexity": 4
+        },
+        {
+          "line": 8,
+          "complexity": 1
+        },
+        {
+          "line": 9,
+          "complexity": 3
+        },
+        {
+          "line": 19,
+          "complexity": 3
+        },
+        {
+          "line": 28,
+          "complexity": 3
+        },
+        {
+          "line": 33,
+          "complexity": 1
+        },
+        {
+          "line": 34,
+          "complexity": 2
+        }
+      ],
+      "imports": [
+        "../model/Shape.js",
+        "../model/SvgDocument.js"
+      ]
+    },
+    {
+      "path": "src/cli/Token.ts",
+      "category": "kernel",
+      "responsibility": "分词、分派与结构展示",
+      "lines": 3,
+      "functions": 1,
+      "complexity": 1,
+      "units": [
+        {
+          "line": 2,
+          "complexity": 1
+        }
+      ],
+      "imports": []
+    },
+    {
+      "path": "src/cli/Tokenizer.ts",
+      "category": "kernel",
+      "responsibility": "分词、分派与结构展示",
+      "lines": 35,
+      "functions": 1,
+      "complexity": 19,
+      "units": [
+        {
+          "line": 4,
+          "complexity": 19
+        }
+      ],
+      "imports": [
+        "./Token.js"
+      ]
+    },
+    {
+      "path": "src/commands/AddToCommand.ts",
+      "category": "kernel",
+      "responsibility": "可撤销编辑事务与历史",
+      "lines": 9,
+      "functions": 2,
+      "complexity": 2,
+      "units": [
+        {
+          "line": 5,
+          "complexity": 1
+        },
+        {
+          "line": 6,
+          "complexity": 1
+        }
+      ],
+      "imports": [
+        "./EditCommand.js",
+        "../model/SvgDocument.js"
+      ]
+    },
+    {
+      "path": "src/commands/Command.ts",
+      "category": "kernel",
+      "responsibility": "可撤销编辑事务与历史",
+      "lines": 7,
+      "functions": 0,
+      "complexity": 0,
+      "units": [],
+      "imports": [
+        "../model/SvgDocument.js"
+      ]
+    },
+    {
+      "path": "src/commands/CreateCommand.ts",
+      "category": "kernel",
+      "responsibility": "可撤销编辑事务与历史",
+      "lines": 15,
+      "functions": 2,
+      "complexity": 3,
+      "units": [
+        {
+          "line": 6,
+          "complexity": 1
+        },
+        {
+          "line": 9,
+          "complexity": 2
+        }
+      ],
+      "imports": [
+        "./EditCommand.js",
+        "../model/ShapeFactory.js",
+        "../model/SvgDocument.js"
+      ]
+    },
+    {
+      "path": "src/commands/DeleteCommand.ts",
+      "category": "kernel",
+      "responsibility": "可撤销编辑事务与历史",
+      "lines": 7,
+      "functions": 2,
+      "complexity": 2,
+      "units": [
+        {
+          "line": 5,
+          "complexity": 1
+        },
+        {
+          "line": 6,
+          "complexity": 1
+        }
+      ],
+      "imports": [
+        "./EditCommand.js",
+        "../model/SvgDocument.js"
+      ]
+    },
+    {
+      "path": "src/commands/EditCommand.ts",
+      "category": "kernel",
+      "responsibility": "可撤销编辑事务与历史",
+      "lines": 27,
+      "functions": 3,
+      "complexity": 7,
+      "units": [
+        {
+          "line": 8,
+          "complexity": 3
+        },
+        {
+          "line": 18,
+          "complexity": 2
+        },
+        {
+          "line": 22,
+          "complexity": 2
+        }
+      ],
+      "imports": [
+        "./Command.js",
+        "../model/SvgDocument.js"
+      ]
+    },
+    {
+      "path": "src/commands/GroupCommand.ts",
+      "category": "kernel",
+      "responsibility": "可撤销编辑事务与历史",
+      "lines": 7,
+      "functions": 2,
+      "complexity": 2,
+      "units": [
+        {
+          "line": 5,
+          "complexity": 1
+        },
+        {
+          "line": 6,
+          "complexity": 1
+        }
+      ],
+      "imports": [
+        "./EditCommand.js",
+        "../model/SvgDocument.js"
+      ]
+    },
+    {
+      "path": "src/commands/History.ts",
+      "category": "kernel",
+      "responsibility": "可撤销编辑事务与历史",
+      "lines": 27,
+      "functions": 4,
+      "complexity": 8,
+      "units": [
+        {
+          "line": 7,
+          "complexity": 1
+        },
+        {
+          "line": 12,
+          "complexity": 1
+        },
+        {
+          "line": 13,
+          "complexity": 3
+        },
+        {
+          "line": 20,
+          "complexity": 3
+        }
+      ],
+      "imports": [
+        "./Command.js",
+        "../model/SvgDocument.js"
+      ]
+    },
+    {
+      "path": "src/commands/MoveCommand.ts",
+      "category": "kernel",
+      "responsibility": "可撤销编辑事务与历史",
+      "lines": 10,
+      "functions": 2,
+      "complexity": 2,
+      "units": [
+        {
+          "line": 5,
+          "complexity": 1
+        },
+        {
+          "line": 6,
+          "complexity": 1
+        }
+      ],
+      "imports": [
+        "./EditCommand.js",
+        "../model/SvgDocument.js"
+      ]
+    },
+    {
+      "path": "src/commands/ReorderCommand.ts",
+      "category": "kernel",
+      "responsibility": "可撤销编辑事务与历史",
+      "lines": 9,
+      "functions": 2,
+      "complexity": 4,
+      "units": [
+        {
+          "line": 5,
+          "complexity": 2
+        },
+        {
+          "line": 6,
+          "complexity": 2
+        }
+      ],
+      "imports": [
+        "./EditCommand.js",
+        "../model/SvgDocument.js"
+      ]
+    },
+    {
+      "path": "src/commands/ScaleCommand.ts",
+      "category": "kernel",
+      "responsibility": "可撤销编辑事务与历史",
+      "lines": 10,
+      "functions": 2,
+      "complexity": 2,
+      "units": [
+        {
+          "line": 5,
+          "complexity": 1
+        },
+        {
+          "line": 6,
+          "complexity": 1
+        }
+      ],
+      "imports": [
+        "./EditCommand.js",
+        "../model/SvgDocument.js"
+      ]
+    },
+    {
+      "path": "src/commands/SetCommand.ts",
+      "category": "kernel",
+      "responsibility": "可撤销编辑事务与历史",
+      "lines": 10,
+      "functions": 2,
+      "complexity": 2,
+      "units": [
+        {
+          "line": 5,
+          "complexity": 1
+        },
+        {
+          "line": 6,
+          "complexity": 1
+        }
+      ],
+      "imports": [
+        "./EditCommand.js",
+        "../model/SvgDocument.js"
+      ]
+    },
+    {
+      "path": "src/commands/UngroupCommand.ts",
+      "category": "kernel",
+      "responsibility": "可撤销编辑事务与历史",
+      "lines": 7,
+      "functions": 2,
+      "complexity": 2,
+      "units": [
+        {
+          "line": 5,
+          "complexity": 1
+        },
+        {
+          "line": 6,
+          "complexity": 1
+        }
+      ],
+      "imports": [
+        "./EditCommand.js",
+        "../model/SvgDocument.js"
+      ]
+    },
+    {
+      "path": "src/io/FileStore.ts",
+      "category": "kernel",
+      "responsibility": "SVG 编解码与文件访问",
+      "lines": 4,
+      "functions": 0,
+      "complexity": 0,
+      "units": [],
+      "imports": []
+    },
+    {
+      "path": "src/io/NodeFileStore.ts",
+      "category": "kernel",
+      "responsibility": "SVG 编解码与文件访问",
+      "lines": 33,
+      "functions": 2,
+      "complexity": 6,
+      "units": [
+        {
+          "line": 7,
+          "complexity": 2
+        },
+        {
+          "line": 15,
+          "complexity": 4
+        }
+      ],
+      "imports": [
+        "node:crypto",
+        "node:fs",
+        "node:path",
+        "./FileStore.js"
+      ]
+    },
+    {
+      "path": "src/io/SvgCodec.ts",
+      "category": "kernel",
+      "responsibility": "SVG 编解码与文件访问",
+      "lines": 175,
+      "functions": 20,
+      "complexity": 81,
+      "units": [
+        {
+          "line": 15,
+          "complexity": 13
+        },
+        {
+          "line": 25,
+          "complexity": 1
+        },
+        {
+          "line": 41,
+          "complexity": 4
+        },
+        {
+          "line": 54,
+          "complexity": 15
+        },
+        {
+          "line": 65,
+          "complexity": 2
+        },
+        {
+          "line": 90,
+          "complexity": 6
+        },
+        {
+          "line": 106,
+          "complexity": 1
+        },
+        {
+          "line": 110,
+          "complexity": 3
+        },
+        {
+          "line": 114,
+          "complexity": 1
+        },
+        {
+          "line": 122,
+          "complexity": 1
+        },
+        {
+          "line": 123,
+          "complexity": 2
+        },
+        {
+          "line": 129,
+          "complexity": 2
+        },
+        {
+          "line": 135,
+          "complexity": 2
+        },
+        {
+          "line": 136,
+          "complexity": 1
+        },
+        {
+          "line": 139,
+          "complexity": 4
+        },
+        {
+          "line": 148,
+          "complexity": 9
+        },
+        {
+          "line": 158,
+          "complexity": 9
+        },
+        {
+          "line": 164,
+          "complexity": 1
+        },
+        {
+          "line": 168,
+          "complexity": 3
+        },
+        {
+          "line": 170,
+          "complexity": 1
+        }
+      ],
+      "imports": [
+        "xml-js",
+        "../model/Shape.js",
+        "../model/ShapeFactory.js",
+        "../model/SvgDocument.js",
+        "../model/Value.js",
+        "./XmlSyntax.js"
+      ]
+    },
+    {
+      "path": "src/io/SvgFileRepository.ts",
+      "category": "kernel",
+      "responsibility": "SVG 编解码与文件访问",
+      "lines": 15,
+      "functions": 3,
+      "complexity": 3,
+      "units": [
+        {
+          "line": 6,
+          "complexity": 1
+        },
+        {
+          "line": 8,
+          "complexity": 1
+        },
+        {
+          "line": 12,
+          "complexity": 1
+        }
+      ],
+      "imports": [
+        "../model/SvgDocument.js",
+        "./FileStore.js",
+        "./SvgCodec.js"
+      ]
+    },
+    {
+      "path": "src/io/XmlSyntax.ts",
+      "category": "kernel",
+      "responsibility": "SVG 编解码与文件访问",
+      "lines": 31,
+      "functions": 1,
+      "complexity": 14,
+      "units": [
+        {
+          "line": 2,
+          "complexity": 14
+        }
+      ],
+      "imports": []
+    },
+    {
+      "path": "src/main.ts",
+      "category": "assembly",
+      "responsibility": "CLI 启动组合根",
+      "lines": 16,
+      "functions": 0,
+      "complexity": 5,
+      "units": [
+        {
+          "line": 1,
+          "complexity": 5,
+          "topLevel": true
+        }
+      ],
+      "imports": [
+        "./application/EditorSession.js",
+        "./cli/CommandDispatcher.js",
+        "./cli/Repl.js",
+        "./io/NodeFileStore.js",
+        "./io/SvgFileRepository.js"
+      ]
+    },
+    {
+      "path": "src/model/Circle.ts",
+      "category": "kernel",
+      "responsibility": "图形、容器、文档与图形注册",
+      "lines": 6,
+      "functions": 2,
+      "complexity": 2,
+      "units": [
+        {
+          "line": 4,
+          "complexity": 1
+        },
+        {
+          "line": 5,
+          "complexity": 1
+        }
+      ],
+      "imports": [
+        "./Shape.js"
+      ]
+    },
+    {
+      "path": "src/model/Ellipse.ts",
+      "category": "kernel",
+      "responsibility": "图形、容器、文档与图形注册",
+      "lines": 6,
+      "functions": 2,
+      "complexity": 2,
+      "units": [
+        {
+          "line": 4,
+          "complexity": 1
+        },
+        {
+          "line": 5,
+          "complexity": 1
+        }
+      ],
+      "imports": [
+        "./Shape.js"
+      ]
+    },
+    {
+      "path": "src/model/Group.ts",
+      "category": "kernel",
+      "responsibility": "图形、容器、文档与图形注册",
+      "lines": 35,
+      "functions": 10,
+      "complexity": 21,
+      "units": [
+        {
+          "line": 5,
+          "complexity": 1
+        },
+        {
+          "line": 6,
+          "complexity": 1
+        },
+        {
+          "line": 7,
+          "complexity": 1
+        },
+        {
+          "line": 8,
+          "complexity": 7
+        },
+        {
+          "line": 14,
+          "complexity": 2
+        },
+        {
+          "line": 19,
+          "complexity": 2
+        },
+        {
+          "line": 23,
+          "complexity": 2
+        },
+        {
+          "line": 27,
+          "complexity": 2
+        },
+        {
+          "line": 32,
+          "complexity": 1
+        },
+        {
+          "line": 33,
+          "complexity": 2
+        }
+      ],
+      "imports": [
+        "./Shape.js"
+      ]
+    },
+    {
+      "path": "src/model/Line.ts",
+      "category": "kernel",
+      "responsibility": "图形、容器、文档与图形注册",
+      "lines": 6,
+      "functions": 2,
+      "complexity": 2,
+      "units": [
+        {
+          "line": 4,
+          "complexity": 1
+        },
+        {
+          "line": 5,
+          "complexity": 1
+        }
+      ],
+      "imports": [
+        "./Shape.js"
+      ]
+    },
+    {
+      "path": "src/model/Rect.ts",
+      "category": "kernel",
+      "responsibility": "图形、容器、文档与图形注册",
+      "lines": 6,
+      "functions": 2,
+      "complexity": 2,
+      "units": [
+        {
+          "line": 4,
+          "complexity": 1
+        },
+        {
+          "line": 5,
+          "complexity": 1
+        }
+      ],
+      "imports": [
+        "./Shape.js"
+      ]
+    },
+    {
+      "path": "src/model/Shape.ts",
+      "category": "kernel",
+      "responsibility": "图形、容器、文档与图形注册",
+      "lines": 75,
+      "functions": 15,
+      "complexity": 32,
+      "units": [
+        {
+          "line": 8,
+          "complexity": 2
+        },
+        {
+          "line": 19,
+          "complexity": 1
+        },
+        {
+          "line": 20,
+          "complexity": 1
+        },
+        {
+          "line": 21,
+          "complexity": 1
+        },
+        {
+          "line": 22,
+          "complexity": 1
+        },
+        {
+          "line": 23,
+          "complexity": 1
+        },
+        {
+          "line": 24,
+          "complexity": 1
+        },
+        {
+          "line": 26,
+          "complexity": 10
+        },
+        {
+          "line": 47,
+          "complexity": 5
+        },
+        {
+          "line": 55,
+          "complexity": 3
+        },
+        {
+          "line": 61,
+          "complexity": 2
+        },
+        {
+          "line": 66,
+          "complexity": 1
+        },
+        {
+          "line": 67,
+          "complexity": 1
+        },
+        {
+          "line": 68,
+          "complexity": 1
+        },
+        {
+          "line": 69,
+          "complexity": 1
+        }
+      ],
+      "imports": [
+        "./Value.js"
+      ]
+    },
+    {
+      "path": "src/model/ShapeFactory.ts",
+      "category": "kernel",
+      "responsibility": "图形、容器、文档与图形注册",
+      "lines": 39,
+      "functions": 11,
+      "complexity": 18,
+      "units": [
+        {
+          "line": 12,
+          "complexity": 1
+        },
+        {
+          "line": 13,
+          "complexity": 1
+        },
+        {
+          "line": 14,
+          "complexity": 1
+        },
+        {
+          "line": 15,
+          "complexity": 1
+        },
+        {
+          "line": 16,
+          "complexity": 1
+        },
+        {
+          "line": 17,
+          "complexity": 1
+        },
+        {
+          "line": 19,
+          "complexity": 2
+        },
+        {
+          "line": 24,
+          "complexity": 7
+        },
+        {
+          "line": 27,
+          "complexity": 1
+        },
+        {
+          "line": 30,
+          "complexity": 1
+        },
+        {
+          "line": 34,
+          "complexity": 1
+        }
+      ],
+      "imports": [
+        "./Shape.js",
+        "./Rect.js",
+        "./Circle.js",
+        "./Ellipse.js",
+        "./Line.js",
+        "./Text.js",
+        "./Group.js"
+      ]
+    },
+    {
+      "path": "src/model/SvgDocument.ts",
+      "category": "kernel",
+      "responsibility": "图形、容器、文档与图形注册",
+      "lines": 116,
+      "functions": 33,
+      "complexity": 56,
+      "units": [
+        {
+          "line": 10,
+          "complexity": 1
+        },
+        {
+          "line": 14,
+          "complexity": 1
+        },
+        {
+          "line": 15,
+          "complexity": 1
+        },
+        {
+          "line": 16,
+          "complexity": 1
+        },
+        {
+          "line": 17,
+          "complexity": 1
+        },
+        {
+          "line": 18,
+          "complexity": 1
+        },
+        {
+          "line": 19,
+          "complexity": 1
+        },
+        {
+          "line": 25,
+          "complexity": 1
+        },
+        {
+          "line": 27,
+          "complexity": 1
+        },
+        {
+          "line": 31,
+          "complexity": 2
+        },
+        {
+          "line": 32,
+          "complexity": 1
+        },
+        {
+          "line": 36,
+          "complexity": 3
+        },
+        {
+          "line": 38,
+          "complexity": 1
+        },
+        {
+          "line": 40,
+          "complexity": 4
+        },
+        {
+          "line": 42,
+          "complexity": 1
+        },
+        {
+          "line": 47,
+          "complexity": 2
+        },
+        {
+          "line": 48,
+          "complexity": 1
+        },
+        {
+          "line": 52,
+          "complexity": 2
+        },
+        {
+          "line": 53,
+          "complexity": 2
+        },
+        {
+          "line": 54,
+          "complexity": 1
+        },
+        {
+          "line": 57,
+          "complexity": 2
+        },
+        {
+          "line": 66,
+          "complexity": 1
+        },
+        {
+          "line": 67,
+          "complexity": 9
+        },
+        {
+          "line": 71,
+          "complexity": 1
+        },
+        {
+          "line": 73,
+          "complexity": 2
+        },
+        {
+          "line": 78,
+          "complexity": 1
+        },
+        {
+          "line": 80,
+          "complexity": 1
+        },
+        {
+          "line": 88,
+          "complexity": 2
+        },
+        {
+          "line": 94,
+          "complexity": 1
+        },
+        {
+          "line": 96,
+          "complexity": 3
+        },
+        {
+          "line": 102,
+          "complexity": 2
+        },
+        {
+          "line": 106,
+          "complexity": 1
+        },
+        {
+          "line": 111,
+          "complexity": 1
+        }
+      ],
+      "imports": [
+        "./Group.js",
+        "./Shape.js",
+        "./Value.js"
+      ]
+    },
+    {
+      "path": "src/model/Text.ts",
+      "category": "kernel",
+      "responsibility": "图形、容器、文档与图形注册",
+      "lines": 7,
+      "functions": 3,
+      "complexity": 3,
+      "units": [
+        {
+          "line": 4,
+          "complexity": 1
+        },
+        {
+          "line": 5,
+          "complexity": 1
+        },
+        {
+          "line": 6,
+          "complexity": 1
+        }
+      ],
+      "imports": [
+        "./Shape.js"
+      ]
+    },
+    {
+      "path": "src/model/Value.ts",
+      "category": "kernel",
+      "responsibility": "图形、容器、文档与图形注册",
+      "lines": 29,
+      "functions": 4,
+      "complexity": 13,
+      "units": [
+        {
+          "line": 2,
+          "complexity": 5
+        },
+        {
+          "line": 11,
+          "complexity": 2
+        },
+        {
+          "line": 17,
+          "complexity": 3
+        },
+        {
+          "line": 24,
+          "complexity": 3
+        }
+      ],
+      "imports": []
+    }
+  ],
+  "target": [
+    {
+      "path": "plugins/builtin-commands/src/BuiltinCommandsPlugin.ts",
+      "category": "plugins",
+      "responsibility": "插件包 builtin-commands",
+      "lines": 75,
+      "functions": 28,
+      "complexity": 36,
+      "units": [
+        {
+          "line": 16,
+          "complexity": 1
+        },
+        {
+          "line": 18,
+          "complexity": 1
+        },
+        {
+          "line": 21,
+          "complexity": 3
+        },
+        {
+          "line": 24,
+          "complexity": 1
+        },
+        {
+          "line": 25,
+          "complexity": 1
+        },
+        {
+          "line": 26,
+          "complexity": 3
+        },
+        {
+          "line": 30,
+          "complexity": 1
+        },
+        {
+          "line": 31,
+          "complexity": 1
+        },
+        {
+          "line": 32,
+          "complexity": 1
+        },
+        {
+          "line": 35,
+          "complexity": 1
+        },
+        {
+          "line": 36,
+          "complexity": 1
+        },
+        {
+          "line": 37,
+          "complexity": 1
+        },
+        {
+          "line": 37,
+          "complexity": 1
+        },
+        {
+          "line": 38,
+          "complexity": 1
+        },
+        {
+          "line": 39,
+          "complexity": 1
+        },
+        {
+          "line": 40,
+          "complexity": 1
+        },
+        {
+          "line": 41,
+          "complexity": 1
+        },
+        {
+          "line": 42,
+          "complexity": 1
+        },
+        {
+          "line": 43,
+          "complexity": 1
+        },
+        {
+          "line": 44,
+          "complexity": 1
+        },
+        {
+          "line": 45,
+          "complexity": 1
+        },
+        {
+          "line": 46,
+          "complexity": 1
+        },
+        {
+          "line": 47,
+          "complexity": 1
+        },
+        {
+          "line": 48,
+          "complexity": 1
+        },
+        {
+          "line": 51,
+          "complexity": 5
+        },
+        {
+          "line": 61,
+          "complexity": 1
+        },
+        {
+          "line": 64,
+          "complexity": 1
+        },
+        {
+          "line": 66,
+          "complexity": 1
+        }
+      ],
+      "imports": [
+        "../../../src/commands/AddToCommand.js",
+        "../../../src/commands/CreateCommand.js",
+        "../../../src/commands/DeleteCommand.js",
+        "../../../src/commands/GroupCommand.js",
+        "../../../src/commands/MoveCommand.js",
+        "../../../src/commands/ReorderCommand.js",
+        "../../../src/commands/ScaleCommand.js",
+        "../../../src/commands/SetCommand.js",
+        "../../../src/commands/UngroupCommand.js",
+        "../../../src/model/Value.js",
+        "../../../src/cli/Token.js",
+        "../../../src/extensions/CommandContext.js",
+        "./RegisteredCommand.js"
+      ]
+    },
+    {
+      "path": "plugins/builtin-commands/src/RegisteredCommand.ts",
+      "category": "plugins",
+      "responsibility": "插件包 builtin-commands",
+      "lines": 13,
+      "functions": 2,
+      "complexity": 2,
+      "units": [
+        {
+          "line": 5,
+          "complexity": 1
+        },
+        {
+          "line": 12,
+          "complexity": 1
+        }
+      ],
+      "imports": [
+        "../../../src/extensions/Command.js",
+        "../../../src/cli/Token.js"
+      ]
+    },
+    {
+      "path": "plugins/builtin-shapes/src/BuiltinShapeProvider.ts",
+      "category": "plugins",
+      "responsibility": "插件包 builtin-shapes",
+      "lines": 32,
+      "functions": 7,
+      "complexity": 15,
+      "units": [
+        {
+          "line": 7,
+          "complexity": 1
+        },
+        {
+          "line": 14,
+          "complexity": 7
+        },
+        {
+          "line": 16,
+          "complexity": 1
+        },
+        {
+          "line": 19,
+          "complexity": 1
+        },
+        {
+          "line": 23,
+          "complexity": 1
+        },
+        {
+          "line": 24,
+          "complexity": 3
+        },
+        {
+          "line": 27,
+          "complexity": 1
+        }
+      ],
+      "imports": [
+        "../../../src/extensions/ShapeProvider.js",
+        "../../../src/extensions/SvgShapeSource.js",
+        "../../../src/model/Shape.js"
+      ]
+    },
+    {
+      "path": "plugins/builtin-shapes/src/BuiltinShapesPlugin.ts",
+      "category": "plugins",
+      "responsibility": "插件包 builtin-shapes",
+      "lines": 24,
+      "functions": 8,
+      "complexity": 8,
+      "units": [
+        {
+          "line": 11,
+          "complexity": 1
+        },
+        {
+          "line": 13,
+          "complexity": 1
+        },
+        {
+          "line": 14,
+          "complexity": 1
+        },
+        {
+          "line": 15,
+          "complexity": 1
+        },
+        {
+          "line": 16,
+          "complexity": 1
+        },
+        {
+          "line": 17,
+          "complexity": 1
+        },
+        {
+          "line": 18,
+          "complexity": 1
+        },
+        {
+          "line": 20,
+          "complexity": 1
+        }
+      ],
+      "imports": [
+        "../../../src/extensions/ShapeProvider.js",
+        "../../../src/model/Rect.js",
+        "../../../src/model/Circle.js",
+        "../../../src/model/Ellipse.js",
+        "../../../src/model/Line.js",
+        "../../../src/model/Text.js",
+        "../../../src/model/Group.js",
+        "./BuiltinShapeProvider.js"
+      ]
+    },
+    {
+      "path": "src/application/EditorSession.ts",
+      "category": "kernel",
+      "responsibility": "文档会话",
+      "lines": 52,
+      "functions": 10,
+      "complexity": 17,
+      "units": [
+        {
+          "line": 11,
+          "complexity": 1
+        },
+        {
+          "line": 13,
+          "complexity": 2
+        },
+        {
+          "line": 18,
+          "complexity": 1
+        },
+        {
+          "line": 20,
+          "complexity": 1
+        },
+        {
+          "line": 26,
+          "complexity": 1
+        },
+        {
+          "line": 32,
+          "complexity": 3
+        },
+        {
+          "line": 41,
+          "complexity": 5
+        },
+        {
+          "line": 49,
+          "complexity": 1
+        },
+        {
+          "line": 50,
+          "complexity": 1
+        },
+        {
+          "line": 51,
+          "complexity": 1
+        }
+      ],
+      "imports": [
+        "../commands/Command.js",
+        "../commands/History.js",
+        "../io/SvgFileRepository.js",
+        "../model/SvgDocument.js"
+      ]
+    },
+    {
+      "path": "src/cli/CommandDispatcher.ts",
+      "category": "kernel",
+      "responsibility": "分词、分派与结构展示",
+      "lines": 66,
+      "functions": 14,
+      "complexity": 33,
+      "units": [
+        {
+          "line": 12,
+          "complexity": 1
+        },
+        {
+          "line": 14,
+          "complexity": 1
+        },
+        {
+          "line": 14,
+          "complexity": 1
+        },
+        {
+          "line": 22,
+          "complexity": 1
+        },
+        {
+          "line": 26,
+          "complexity": 1
+        },
+        {
+          "line": 27,
+          "complexity": 1
+        },
+        {
+          "line": 28,
+          "complexity": 1
+        },
+        {
+          "line": 29,
+          "complexity": 1
+        },
+        {
+          "line": 30,
+          "complexity": 1
+        },
+        {
+          "line": 34,
+          "complexity": 10
+        },
+        {
+          "line": 44,
+          "complexity": 1
+        },
+        {
+          "line": 45,
+          "complexity": 1
+        },
+        {
+          "line": 47,
+          "complexity": 11
+        },
+        {
+          "line": 58,
+          "complexity": 1
+        }
+      ],
+      "imports": [
+        "../extensions/Command.js",
+        "../extensions/CommandContext.js",
+        "../extensions/EditorAccess.js",
+        "../model/ShapeFactory.js",
+        "./ShapeFormatter.js",
+        "./Tokenizer.js",
+        "../extensions/AttributeRegistry.js",
+        "../extensions/TreeDecoratorRegistry.js"
+      ]
+    },
+    {
+      "path": "src/cli/Repl.ts",
+      "category": "kernel",
+      "responsibility": "分词、分派与结构展示",
+      "lines": 25,
+      "functions": 4,
+      "complexity": 10,
+      "units": [
+        {
+          "line": 6,
+          "complexity": 1
+        },
+        {
+          "line": 8,
+          "complexity": 7
+        },
+        {
+          "line": 11,
+          "complexity": 1
+        },
+        {
+          "line": 12,
+          "complexity": 1
+        }
+      ],
+      "imports": [
+        "node:readline",
+        "node:stream",
+        "./CommandDispatcher.js"
+      ]
+    },
+    {
+      "path": "src/cli/ShapeFormatter.ts",
+      "category": "kernel",
+      "responsibility": "分词、分派与结构展示",
+      "lines": 39,
+      "functions": 8,
+      "complexity": 18,
+      "units": [
+        {
+          "line": 6,
+          "complexity": 1
+        },
+        {
+          "line": 7,
+          "complexity": 4
+        },
+        {
+          "line": 11,
+          "complexity": 1
+        },
+        {
+          "line": 12,
+          "complexity": 3
+        },
+        {
+          "line": 22,
+          "complexity": 3
+        },
+        {
+          "line": 31,
+          "complexity": 3
+        },
+        {
+          "line": 36,
+          "complexity": 1
+        },
+        {
+          "line": 37,
+          "complexity": 2
+        }
+      ],
+      "imports": [
+        "../model/Shape.js",
+        "../model/SvgDocument.js",
+        "../extensions/TreeDecoratorRegistry.js"
+      ]
+    },
+    {
+      "path": "src/cli/Token.ts",
+      "category": "kernel",
+      "responsibility": "分词、分派与结构展示",
+      "lines": 3,
+      "functions": 1,
+      "complexity": 1,
+      "units": [
+        {
+          "line": 2,
+          "complexity": 1
+        }
+      ],
+      "imports": []
+    },
+    {
+      "path": "src/cli/Tokenizer.ts",
+      "category": "kernel",
+      "responsibility": "分词、分派与结构展示",
+      "lines": 35,
+      "functions": 1,
+      "complexity": 19,
+      "units": [
+        {
+          "line": 4,
+          "complexity": 19
+        }
+      ],
+      "imports": [
+        "./Token.js"
+      ]
+    },
+    {
+      "path": "src/commands/AddToCommand.ts",
+      "category": "kernel",
+      "responsibility": "可撤销编辑事务与历史",
+      "lines": 9,
+      "functions": 2,
+      "complexity": 2,
+      "units": [
+        {
+          "line": 5,
+          "complexity": 1
+        },
+        {
+          "line": 6,
+          "complexity": 1
+        }
+      ],
+      "imports": [
+        "./EditCommand.js",
+        "../model/SvgDocument.js"
+      ]
+    },
+    {
+      "path": "src/commands/Command.ts",
+      "category": "kernel",
+      "responsibility": "可撤销编辑事务与历史",
+      "lines": 7,
+      "functions": 0,
+      "complexity": 0,
+      "units": [],
+      "imports": [
+        "../model/SvgDocument.js"
+      ]
+    },
+    {
+      "path": "src/commands/CreateCommand.ts",
+      "category": "kernel",
+      "responsibility": "可撤销编辑事务与历史",
+      "lines": 15,
+      "functions": 2,
+      "complexity": 3,
+      "units": [
+        {
+          "line": 6,
+          "complexity": 1
+        },
+        {
+          "line": 9,
+          "complexity": 2
+        }
+      ],
+      "imports": [
+        "./EditCommand.js",
+        "../model/ShapeFactory.js",
+        "../model/SvgDocument.js"
+      ]
+    },
+    {
+      "path": "src/commands/DeleteCommand.ts",
+      "category": "kernel",
+      "responsibility": "可撤销编辑事务与历史",
+      "lines": 7,
+      "functions": 2,
+      "complexity": 2,
+      "units": [
+        {
+          "line": 5,
+          "complexity": 1
+        },
+        {
+          "line": 6,
+          "complexity": 1
+        }
+      ],
+      "imports": [
+        "./EditCommand.js",
+        "../model/SvgDocument.js"
+      ]
+    },
+    {
+      "path": "src/commands/EditCommand.ts",
+      "category": "kernel",
+      "responsibility": "可撤销编辑事务与历史",
+      "lines": 27,
+      "functions": 3,
+      "complexity": 7,
+      "units": [
+        {
+          "line": 8,
+          "complexity": 3
+        },
+        {
+          "line": 18,
+          "complexity": 2
+        },
+        {
+          "line": 22,
+          "complexity": 2
+        }
+      ],
+      "imports": [
+        "./Command.js",
+        "../model/SvgDocument.js"
+      ]
+    },
+    {
+      "path": "src/commands/GroupCommand.ts",
+      "category": "kernel",
+      "responsibility": "可撤销编辑事务与历史",
+      "lines": 7,
+      "functions": 2,
+      "complexity": 2,
+      "units": [
+        {
+          "line": 5,
+          "complexity": 1
+        },
+        {
+          "line": 6,
+          "complexity": 1
+        }
+      ],
+      "imports": [
+        "./EditCommand.js",
+        "../model/SvgDocument.js"
+      ]
+    },
+    {
+      "path": "src/commands/History.ts",
+      "category": "kernel",
+      "responsibility": "可撤销编辑事务与历史",
+      "lines": 27,
+      "functions": 4,
+      "complexity": 8,
+      "units": [
+        {
+          "line": 7,
+          "complexity": 1
+        },
+        {
+          "line": 12,
+          "complexity": 1
+        },
+        {
+          "line": 13,
+          "complexity": 3
+        },
+        {
+          "line": 20,
+          "complexity": 3
+        }
+      ],
+      "imports": [
+        "./Command.js",
+        "../model/SvgDocument.js"
+      ]
+    },
+    {
+      "path": "src/commands/MoveCommand.ts",
+      "category": "kernel",
+      "responsibility": "可撤销编辑事务与历史",
+      "lines": 10,
+      "functions": 2,
+      "complexity": 2,
+      "units": [
+        {
+          "line": 5,
+          "complexity": 1
+        },
+        {
+          "line": 6,
+          "complexity": 1
+        }
+      ],
+      "imports": [
+        "./EditCommand.js",
+        "../model/SvgDocument.js"
+      ]
+    },
+    {
+      "path": "src/commands/ReorderCommand.ts",
+      "category": "kernel",
+      "responsibility": "可撤销编辑事务与历史",
+      "lines": 9,
+      "functions": 2,
+      "complexity": 4,
+      "units": [
+        {
+          "line": 5,
+          "complexity": 2
+        },
+        {
+          "line": 6,
+          "complexity": 2
+        }
+      ],
+      "imports": [
+        "./EditCommand.js",
+        "../model/SvgDocument.js"
+      ]
+    },
+    {
+      "path": "src/commands/ScaleCommand.ts",
+      "category": "kernel",
+      "responsibility": "可撤销编辑事务与历史",
+      "lines": 10,
+      "functions": 2,
+      "complexity": 2,
+      "units": [
+        {
+          "line": 5,
+          "complexity": 1
+        },
+        {
+          "line": 6,
+          "complexity": 1
+        }
+      ],
+      "imports": [
+        "./EditCommand.js",
+        "../model/SvgDocument.js"
+      ]
+    },
+    {
+      "path": "src/commands/SetCommand.ts",
+      "category": "kernel",
+      "responsibility": "可撤销编辑事务与历史",
+      "lines": 11,
+      "functions": 2,
+      "complexity": 2,
+      "units": [
+        {
+          "line": 6,
+          "complexity": 1
+        },
+        {
+          "line": 8,
+          "complexity": 1
+        }
+      ],
+      "imports": [
+        "./EditCommand.js",
+        "../model/SvgDocument.js",
+        "../extensions/AttributeRegistry.js"
+      ]
+    },
+    {
+      "path": "src/commands/UngroupCommand.ts",
+      "category": "kernel",
+      "responsibility": "可撤销编辑事务与历史",
+      "lines": 7,
+      "functions": 2,
+      "complexity": 2,
+      "units": [
+        {
+          "line": 5,
+          "complexity": 1
+        },
+        {
+          "line": 6,
+          "complexity": 1
+        }
+      ],
+      "imports": [
+        "./EditCommand.js",
+        "../model/SvgDocument.js"
+      ]
+    },
+    {
+      "path": "src/extensions/AttributeContext.ts",
+      "category": "kernel",
+      "responsibility": "公开扩展契约与注册表",
+      "lines": 8,
+      "functions": 0,
+      "complexity": 0,
+      "units": [],
+      "imports": [
+        "../model/SvgDocument.js",
+        "../model/Shape.js"
+      ]
+    },
+    {
+      "path": "src/extensions/AttributeHandler.ts",
+      "category": "kernel",
+      "responsibility": "公开扩展契约与注册表",
+      "lines": 10,
+      "functions": 0,
+      "complexity": 0,
+      "units": [],
+      "imports": [
+        "../model/Shape.js",
+        "./AttributeContext.js"
+      ]
+    },
+    {
+      "path": "src/extensions/AttributeRegistry.ts",
+      "category": "kernel",
+      "responsibility": "公开扩展契约与注册表",
+      "lines": 32,
+      "functions": 8,
+      "complexity": 17,
+      "units": [
+        {
+          "line": 6,
+          "complexity": 1
+        },
+        {
+          "line": 7,
+          "complexity": 1
+        },
+        {
+          "line": 9,
+          "complexity": 1
+        },
+        {
+          "line": 9,
+          "complexity": 1
+        },
+        {
+          "line": 11,
+          "complexity": 5
+        },
+        {
+          "line": 19,
+          "complexity": 6
+        },
+        {
+          "line": 21,
+          "complexity": 1
+        },
+        {
+          "line": 22,
+          "complexity": 1
+        }
+      ],
+      "imports": [
+        "./AttributeHandler.js",
+        "../model/SvgDocument.js"
+      ]
+    },
+    {
+      "path": "src/extensions/Command.ts",
+      "category": "kernel",
+      "responsibility": "公开扩展契约与注册表",
+      "lines": 10,
+      "functions": 0,
+      "complexity": 0,
+      "units": [],
+      "imports": [
+        "../cli/Token.js"
+      ]
+    },
+    {
+      "path": "src/extensions/CommandContext.ts",
+      "category": "kernel",
+      "responsibility": "公开扩展契约与注册表",
+      "lines": 16,
+      "functions": 0,
+      "complexity": 0,
+      "units": [],
+      "imports": [
+        "./Command.js",
+        "./EditorAccess.js",
+        "../model/ShapeFactory.js",
+        "../model/SvgDocument.js",
+        "./AttributeRegistry.js"
+      ]
+    },
+    {
+      "path": "src/extensions/EditorAccess.ts",
+      "category": "kernel",
+      "responsibility": "公开扩展契约与注册表",
+      "lines": 15,
+      "functions": 0,
+      "complexity": 0,
+      "units": [],
+      "imports": [
+        "../model/SvgDocument.js",
+        "../commands/Command.js"
+      ]
+    },
+    {
+      "path": "src/extensions/Plugin.ts",
+      "category": "kernel",
+      "responsibility": "公开扩展契约与注册表",
+      "lines": 5,
+      "functions": 0,
+      "complexity": 0,
+      "units": [],
+      "imports": [
+        "./PluginContext.js"
+      ]
+    },
+    {
+      "path": "src/extensions/PluginContext.ts",
+      "category": "kernel",
+      "responsibility": "公开扩展契约与注册表",
+      "lines": 10,
+      "functions": 0,
+      "complexity": 0,
+      "units": [],
+      "imports": [
+        "./CommandContext.js",
+        "./ShapeProvider.js",
+        "./AttributeHandler.js",
+        "./TreeDecorator.js"
+      ]
+    },
+    {
+      "path": "src/extensions/ShapeProvider.ts",
+      "category": "kernel",
+      "responsibility": "公开扩展契约与注册表",
+      "lines": 14,
+      "functions": 0,
+      "complexity": 0,
+      "units": [],
+      "imports": [
+        "../model/Shape.js",
+        "./SvgShapeSource.js"
+      ]
+    },
+    {
+      "path": "src/extensions/SvgShapeSource.ts",
+      "category": "kernel",
+      "responsibility": "公开扩展契约与注册表",
+      "lines": 10,
+      "functions": 0,
+      "complexity": 0,
+      "units": [],
+      "imports": [
+        "../model/Shape.js"
+      ]
+    },
+    {
+      "path": "src/extensions/TreeContext.ts",
+      "category": "kernel",
+      "responsibility": "公开扩展契约与注册表",
+      "lines": 8,
+      "functions": 0,
+      "complexity": 0,
+      "units": [],
+      "imports": [
+        "../model/SvgDocument.js",
+        "../model/Shape.js"
+      ]
+    },
+    {
+      "path": "src/extensions/TreeDecorator.ts",
+      "category": "kernel",
+      "responsibility": "公开扩展契约与注册表",
+      "lines": 7,
+      "functions": 0,
+      "complexity": 0,
+      "units": [],
+      "imports": [
+        "./TreeContext.js"
+      ]
+    },
+    {
+      "path": "src/extensions/TreeDecoratorRegistry.ts",
+      "category": "kernel",
+      "responsibility": "公开扩展契约与注册表",
+      "lines": 26,
+      "functions": 6,
+      "complexity": 16,
+      "units": [
+        {
+          "line": 6,
+          "complexity": 1
+        },
+        {
+          "line": 7,
+          "complexity": 1
+        },
+        {
+          "line": 9,
+          "complexity": 1
+        },
+        {
+          "line": 9,
+          "complexity": 1
+        },
+        {
+          "line": 11,
+          "complexity": 4
+        },
+        {
+          "line": 16,
+          "complexity": 8
+        }
+      ],
+      "imports": [
+        "./TreeDecorator.js",
+        "./TreeContext.js"
+      ]
+    },
+    {
+      "path": "src/host/DefaultDispatcher.ts",
+      "category": "assembly",
+      "responsibility": "装配、激活事务与模块加载",
+      "lines": 13,
+      "functions": 1,
+      "complexity": 1,
+      "units": [
+        {
+          "line": 9,
+          "complexity": 1
+        }
+      ],
+      "imports": [
+        "../cli/CommandDispatcher.js",
+        "../extensions/EditorAccess.js",
+        "../model/ShapeFactory.js",
+        "../../plugins/builtin-commands/src/BuiltinCommandsPlugin.js",
+        "../extensions/AttributeRegistry.js",
+        "../extensions/TreeDecoratorRegistry.js"
+      ]
+    },
+    {
+      "path": "src/host/DefaultShapes.ts",
+      "category": "assembly",
+      "responsibility": "装配、激活事务与模块加载",
+      "lines": 10,
+      "functions": 2,
+      "complexity": 2,
+      "units": [
+        {
+          "line": 6,
+          "complexity": 1
+        },
+        {
+          "line": 8,
+          "complexity": 1
+        }
+      ],
+      "imports": [
+        "../model/ShapeFactory.js",
+        "../../plugins/builtin-shapes/src/BuiltinShapesPlugin.js"
+      ]
+    },
+    {
+      "path": "src/host/PluginHost.ts",
+      "category": "assembly",
+      "responsibility": "装配、激活事务与模块加载",
+      "lines": 88,
+      "functions": 29,
+      "complexity": 49,
+      "units": [
+        {
+          "line": 14,
+          "complexity": 1
+        },
+        {
+          "line": 21,
+          "complexity": 1
+        },
+        {
+          "line": 22,
+          "complexity": 1
+        },
+        {
+          "line": 23,
+          "complexity": 1
+        },
+        {
+          "line": 23,
+          "complexity": 1
+        },
+        {
+          "line": 26,
+          "complexity": 19
+        },
+        {
+          "line": 27,
+          "complexity": 1
+        },
+        {
+          "line": 28,
+          "complexity": 1
+        },
+        {
+          "line": 29,
+          "complexity": 1
+        },
+        {
+          "line": 31,
+          "complexity": 1
+        },
+        {
+          "line": 36,
+          "complexity": 3
+        },
+        {
+          "line": 45,
+          "complexity": 1
+        },
+        {
+          "line": 48,
+          "complexity": 1
+        },
+        {
+          "line": 48,
+          "complexity": 1
+        },
+        {
+          "line": 49,
+          "complexity": 1
+        },
+        {
+          "line": 49,
+          "complexity": 1
+        },
+        {
+          "line": 50,
+          "complexity": 1
+        },
+        {
+          "line": 50,
+          "complexity": 1
+        },
+        {
+          "line": 51,
+          "complexity": 1
+        },
+        {
+          "line": 51,
+          "complexity": 1
+        },
+        {
+          "line": 61,
+          "complexity": 1
+        },
+        {
+          "line": 61,
+          "complexity": 1
+        },
+        {
+          "line": 66,
+          "complexity": 1
+        },
+        {
+          "line": 69,
+          "complexity": 1
+        },
+        {
+          "line": 76,
+          "complexity": 1
+        },
+        {
+          "line": 77,
+          "complexity": 1
+        },
+        {
+          "line": 78,
+          "complexity": 1
+        },
+        {
+          "line": 79,
+          "complexity": 1
+        },
+        {
+          "line": 80,
+          "complexity": 1
+        }
+      ],
+      "imports": [
+        "../cli/CommandDispatcher.js",
+        "../model/ShapeFactory.js",
+        "../extensions/AttributeRegistry.js",
+        "../extensions/TreeDecoratorRegistry.js",
+        "../extensions/EditorAccess.js",
+        "../extensions/Plugin.js",
+        "../extensions/PluginContext.js",
+        "./PluginManifest.js"
+      ]
+    },
+    {
+      "path": "src/host/PluginLoader.ts",
+      "category": "assembly",
+      "responsibility": "装配、激活事务与模块加载",
+      "lines": 83,
+      "functions": 8,
+      "complexity": 44,
+      "units": [
+        {
+          "line": 13,
+          "complexity": 1
+        },
+        {
+          "line": 15,
+          "complexity": 6
+        },
+        {
+          "line": 21,
+          "complexity": 6
+        },
+        {
+          "line": 35,
+          "complexity": 22
+        },
+        {
+          "line": 49,
+          "complexity": 1
+        },
+        {
+          "line": 68,
+          "complexity": 4
+        },
+        {
+          "line": 78,
+          "complexity": 2
+        },
+        {
+          "line": 82,
+          "complexity": 2
+        }
+      ],
+      "imports": [
+        "node:fs",
+        "node:path",
+        "node:module",
+        "node:url",
+        "../extensions/Plugin.js",
+        "./PluginManifest.js",
+        "./PluginHost.js"
+      ]
+    },
+    {
+      "path": "src/host/PluginManifest.ts",
+      "category": "assembly",
+      "responsibility": "装配、激活事务与模块加载",
+      "lines": 9,
+      "functions": 0,
+      "complexity": 0,
+      "units": [],
+      "imports": []
+    },
+    {
+      "path": "src/io/FileStore.ts",
+      "category": "kernel",
+      "responsibility": "SVG 编解码与文件访问",
+      "lines": 4,
+      "functions": 0,
+      "complexity": 0,
+      "units": [],
+      "imports": []
+    },
+    {
+      "path": "src/io/NodeFileStore.ts",
+      "category": "kernel",
+      "responsibility": "SVG 编解码与文件访问",
+      "lines": 33,
+      "functions": 2,
+      "complexity": 6,
+      "units": [
+        {
+          "line": 7,
+          "complexity": 2
+        },
+        {
+          "line": 15,
+          "complexity": 4
+        }
+      ],
+      "imports": [
+        "node:crypto",
+        "node:fs",
+        "node:path",
+        "./FileStore.js"
+      ]
+    },
+    {
+      "path": "src/io/SvgCodec.ts",
+      "category": "kernel",
+      "responsibility": "SVG 编解码与文件访问",
+      "lines": 171,
+      "functions": 21,
+      "complexity": 78,
+      "units": [
+        {
+          "line": 10,
+          "complexity": 1
+        },
+        {
+          "line": 15,
+          "complexity": 13
+        },
+        {
+          "line": 25,
+          "complexity": 1
+        },
+        {
+          "line": 41,
+          "complexity": 4
+        },
+        {
+          "line": 54,
+          "complexity": 11
+        },
+        {
+          "line": 65,
+          "complexity": 2
+        },
+        {
+          "line": 86,
+          "complexity": 6
+        },
+        {
+          "line": 102,
+          "complexity": 1
+        },
+        {
+          "line": 106,
+          "complexity": 3
+        },
+        {
+          "line": 110,
+          "complexity": 1
+        },
+        {
+          "line": 118,
+          "complexity": 1
+        },
+        {
+          "line": 119,
+          "complexity": 2
+        },
+        {
+          "line": 125,
+          "complexity": 2
+        },
+        {
+          "line": 131,
+          "complexity": 2
+        },
+        {
+          "line": 132,
+          "complexity": 1
+        },
+        {
+          "line": 135,
+          "complexity": 4
+        },
+        {
+          "line": 144,
+          "complexity": 9
+        },
+        {
+          "line": 154,
+          "complexity": 9
+        },
+        {
+          "line": 160,
+          "complexity": 1
+        },
+        {
+          "line": 164,
+          "complexity": 3
+        },
+        {
+          "line": 166,
+          "complexity": 1
+        }
+      ],
+      "imports": [
+        "xml-js",
+        "../model/Shape.js",
+        "../model/ShapeFactory.js",
+        "../model/SvgDocument.js",
+        "../model/Value.js",
+        "./XmlSyntax.js"
+      ]
+    },
+    {
+      "path": "src/io/SvgFileRepository.ts",
+      "category": "kernel",
+      "responsibility": "SVG 编解码与文件访问",
+      "lines": 15,
+      "functions": 3,
+      "complexity": 3,
+      "units": [
+        {
+          "line": 6,
+          "complexity": 1
+        },
+        {
+          "line": 8,
+          "complexity": 1
+        },
+        {
+          "line": 12,
+          "complexity": 1
+        }
+      ],
+      "imports": [
+        "../model/SvgDocument.js",
+        "./FileStore.js",
+        "./SvgCodec.js"
+      ]
+    },
+    {
+      "path": "src/io/XmlSyntax.ts",
+      "category": "kernel",
+      "responsibility": "SVG 编解码与文件访问",
+      "lines": 31,
+      "functions": 1,
+      "complexity": 14,
+      "units": [
+        {
+          "line": 2,
+          "complexity": 14
+        }
+      ],
+      "imports": []
+    },
+    {
+      "path": "src/main.ts",
+      "category": "assembly",
+      "responsibility": "CLI 启动组合根",
+      "lines": 38,
+      "functions": 0,
+      "complexity": 11,
+      "units": [
+        {
+          "line": 1,
+          "complexity": 11,
+          "topLevel": true
+        }
+      ],
+      "imports": [
+        "./application/EditorSession.js",
+        "./cli/Repl.js",
+        "./io/NodeFileStore.js",
+        "./io/SvgFileRepository.js",
+        "./io/SvgCodec.js",
+        "./model/ShapeFactory.js",
+        "./host/PluginHost.js",
+        "../plugins/builtin-shapes/src/BuiltinShapesPlugin.js",
+        "../plugins/builtin-commands/src/BuiltinCommandsPlugin.js",
+        "node:fs",
+        "./host/PluginManifest.js",
+        "./host/PluginLoader.js"
+      ]
+    },
+    {
+      "path": "src/model/Circle.ts",
+      "category": "kernel",
+      "responsibility": "图形、容器、文档与图形注册",
+      "lines": 6,
+      "functions": 2,
+      "complexity": 2,
+      "units": [
+        {
+          "line": 4,
+          "complexity": 1
+        },
+        {
+          "line": 5,
+          "complexity": 1
+        }
+      ],
+      "imports": [
+        "./Shape.js"
+      ]
+    },
+    {
+      "path": "src/model/Ellipse.ts",
+      "category": "kernel",
+      "responsibility": "图形、容器、文档与图形注册",
+      "lines": 6,
+      "functions": 2,
+      "complexity": 2,
+      "units": [
+        {
+          "line": 4,
+          "complexity": 1
+        },
+        {
+          "line": 5,
+          "complexity": 1
+        }
+      ],
+      "imports": [
+        "./Shape.js"
+      ]
+    },
+    {
+      "path": "src/model/Group.ts",
+      "category": "kernel",
+      "responsibility": "图形、容器、文档与图形注册",
+      "lines": 35,
+      "functions": 10,
+      "complexity": 21,
+      "units": [
+        {
+          "line": 5,
+          "complexity": 1
+        },
+        {
+          "line": 6,
+          "complexity": 1
+        },
+        {
+          "line": 7,
+          "complexity": 1
+        },
+        {
+          "line": 8,
+          "complexity": 7
+        },
+        {
+          "line": 14,
+          "complexity": 2
+        },
+        {
+          "line": 19,
+          "complexity": 2
+        },
+        {
+          "line": 23,
+          "complexity": 2
+        },
+        {
+          "line": 27,
+          "complexity": 2
+        },
+        {
+          "line": 32,
+          "complexity": 1
+        },
+        {
+          "line": 33,
+          "complexity": 2
+        }
+      ],
+      "imports": [
+        "./Shape.js"
+      ]
+    },
+    {
+      "path": "src/model/Line.ts",
+      "category": "kernel",
+      "responsibility": "图形、容器、文档与图形注册",
+      "lines": 6,
+      "functions": 2,
+      "complexity": 2,
+      "units": [
+        {
+          "line": 4,
+          "complexity": 1
+        },
+        {
+          "line": 5,
+          "complexity": 1
+        }
+      ],
+      "imports": [
+        "./Shape.js"
+      ]
+    },
+    {
+      "path": "src/model/Rect.ts",
+      "category": "kernel",
+      "responsibility": "图形、容器、文档与图形注册",
+      "lines": 6,
+      "functions": 2,
+      "complexity": 2,
+      "units": [
+        {
+          "line": 4,
+          "complexity": 1
+        },
+        {
+          "line": 5,
+          "complexity": 1
+        }
+      ],
+      "imports": [
+        "./Shape.js"
+      ]
+    },
+    {
+      "path": "src/model/Shape.ts",
+      "category": "kernel",
+      "responsibility": "图形、容器、文档与图形注册",
+      "lines": 75,
+      "functions": 15,
+      "complexity": 32,
+      "units": [
+        {
+          "line": 8,
+          "complexity": 2
+        },
+        {
+          "line": 19,
+          "complexity": 1
+        },
+        {
+          "line": 20,
+          "complexity": 1
+        },
+        {
+          "line": 21,
+          "complexity": 1
+        },
+        {
+          "line": 22,
+          "complexity": 1
+        },
+        {
+          "line": 23,
+          "complexity": 1
+        },
+        {
+          "line": 24,
+          "complexity": 1
+        },
+        {
+          "line": 26,
+          "complexity": 10
+        },
+        {
+          "line": 47,
+          "complexity": 5
+        },
+        {
+          "line": 55,
+          "complexity": 3
+        },
+        {
+          "line": 61,
+          "complexity": 2
+        },
+        {
+          "line": 66,
+          "complexity": 1
+        },
+        {
+          "line": 67,
+          "complexity": 1
+        },
+        {
+          "line": 68,
+          "complexity": 1
+        },
+        {
+          "line": 69,
+          "complexity": 1
+        }
+      ],
+      "imports": [
+        "./Value.js"
+      ]
+    },
+    {
+      "path": "src/model/ShapeFactory.ts",
+      "category": "kernel",
+      "responsibility": "图形、容器、文档与图形注册",
+      "lines": 51,
+      "functions": 14,
+      "complexity": 26,
+      "units": [
+        {
+          "line": 7,
+          "complexity": 1
+        },
+        {
+          "line": 8,
+          "complexity": 1
+        },
+        {
+          "line": 10,
+          "complexity": 1
+        },
+        {
+          "line": 10,
+          "complexity": 1
+        },
+        {
+          "line": 13,
+          "complexity": 8
+        },
+        {
+          "line": 21,
+          "complexity": 1
+        },
+        {
+          "line": 21,
+          "complexity": 1
+        },
+        {
+          "line": 23,
+          "complexity": 1
+        },
+        {
+          "line": 27,
+          "complexity": 1
+        },
+        {
+          "line": 31,
+          "complexity": 3
+        },
+        {
+          "line": 33,
+          "complexity": 1
+        },
+        {
+          "line": 34,
+          "complexity": 1
+        },
+        {
+          "line": 41,
+          "complexity": 3
+        },
+        {
+          "line": 46,
+          "complexity": 2
+        }
+      ],
+      "imports": [
+        "../extensions/ShapeProvider.js",
+        "../extensions/SvgShapeSource.js",
+        "./Shape.js"
+      ]
+    },
+    {
+      "path": "src/model/SvgDocument.ts",
+      "category": "kernel",
+      "responsibility": "图形、容器、文档与图形注册",
+      "lines": 116,
+      "functions": 33,
+      "complexity": 56,
+      "units": [
+        {
+          "line": 10,
+          "complexity": 1
+        },
+        {
+          "line": 14,
+          "complexity": 1
+        },
+        {
+          "line": 15,
+          "complexity": 1
+        },
+        {
+          "line": 16,
+          "complexity": 1
+        },
+        {
+          "line": 17,
+          "complexity": 1
+        },
+        {
+          "line": 18,
+          "complexity": 1
+        },
+        {
+          "line": 19,
+          "complexity": 1
+        },
+        {
+          "line": 25,
+          "complexity": 1
+        },
+        {
+          "line": 27,
+          "complexity": 1
+        },
+        {
+          "line": 31,
+          "complexity": 2
+        },
+        {
+          "line": 32,
+          "complexity": 1
+        },
+        {
+          "line": 36,
+          "complexity": 3
+        },
+        {
+          "line": 38,
+          "complexity": 1
+        },
+        {
+          "line": 40,
+          "complexity": 4
+        },
+        {
+          "line": 42,
+          "complexity": 1
+        },
+        {
+          "line": 47,
+          "complexity": 2
+        },
+        {
+          "line": 48,
+          "complexity": 1
+        },
+        {
+          "line": 52,
+          "complexity": 2
+        },
+        {
+          "line": 53,
+          "complexity": 2
+        },
+        {
+          "line": 54,
+          "complexity": 1
+        },
+        {
+          "line": 57,
+          "complexity": 2
+        },
+        {
+          "line": 66,
+          "complexity": 1
+        },
+        {
+          "line": 67,
+          "complexity": 9
+        },
+        {
+          "line": 71,
+          "complexity": 1
+        },
+        {
+          "line": 73,
+          "complexity": 2
+        },
+        {
+          "line": 78,
+          "complexity": 1
+        },
+        {
+          "line": 80,
+          "complexity": 1
+        },
+        {
+          "line": 88,
+          "complexity": 2
+        },
+        {
+          "line": 94,
+          "complexity": 1
+        },
+        {
+          "line": 96,
+          "complexity": 3
+        },
+        {
+          "line": 102,
+          "complexity": 2
+        },
+        {
+          "line": 106,
+          "complexity": 1
+        },
+        {
+          "line": 111,
+          "complexity": 1
+        }
+      ],
+      "imports": [
+        "./Group.js",
+        "./Shape.js",
+        "./Value.js"
+      ]
+    },
+    {
+      "path": "src/model/Text.ts",
+      "category": "kernel",
+      "responsibility": "图形、容器、文档与图形注册",
+      "lines": 7,
+      "functions": 3,
+      "complexity": 3,
+      "units": [
+        {
+          "line": 4,
+          "complexity": 1
+        },
+        {
+          "line": 5,
+          "complexity": 1
+        },
+        {
+          "line": 6,
+          "complexity": 1
+        }
+      ],
+      "imports": [
+        "./Shape.js"
+      ]
+    },
+    {
+      "path": "src/model/Value.ts",
+      "category": "kernel",
+      "responsibility": "图形、容器、文档与图形注册",
+      "lines": 29,
+      "functions": 4,
+      "complexity": 13,
+      "units": [
+        {
+          "line": 2,
+          "complexity": 5
+        },
+        {
+          "line": 11,
+          "complexity": 2
+        },
+        {
+          "line": 17,
+          "complexity": 3
+        },
+        {
+          "line": 24,
+          "complexity": 3
+        }
+      ],
+      "imports": []
+    },
+    {
+      "path": "vscode-extension/src/extension.ts",
+      "category": "vscode",
+      "responsibility": "VSCode 文件标记与大纲",
+      "lines": 32,
+      "functions": 2,
+      "complexity": 5,
+      "units": [
+        {
+          "line": 6,
+          "complexity": 1
+        },
+        {
+          "line": 19,
+          "complexity": 4
+        }
+      ],
+      "imports": [
+        "vscode",
+        "./SvgFileDecorationProvider",
+        "./SvgDocumentSymbolProvider",
+        "./SvgOutlineParser"
+      ]
+    },
+    {
+      "path": "vscode-extension/src/OutlineElement.ts",
+      "category": "vscode",
+      "responsibility": "VSCode 文件标记与大纲",
+      "lines": 18,
+      "functions": 5,
+      "complexity": 5,
+      "units": [
+        {
+          "line": 5,
+          "complexity": 1
+        },
+        {
+          "line": 14,
+          "complexity": 1
+        },
+        {
+          "line": 15,
+          "complexity": 1
+        },
+        {
+          "line": 16,
+          "complexity": 1
+        },
+        {
+          "line": 17,
+          "complexity": 1
+        }
+      ],
+      "imports": []
+    },
+    {
+      "path": "vscode-extension/src/sax.d.ts",
+      "category": "vscode",
+      "responsibility": "VSCode 文件标记与大纲",
+      "lines": 17,
+      "functions": 0,
+      "complexity": 0,
+      "units": [],
+      "imports": []
+    },
+    {
+      "path": "vscode-extension/src/SvgDocumentSymbolProvider.ts",
+      "category": "vscode",
+      "responsibility": "VSCode 文件标记与大纲",
+      "lines": 23,
+      "functions": 4,
+      "complexity": 6,
+      "units": [
+        {
+          "line": 8,
+          "complexity": 2
+        },
+        {
+          "line": 11,
+          "complexity": 1
+        },
+        {
+          "line": 14,
+          "complexity": 2
+        },
+        {
+          "line": 20,
+          "complexity": 1
+        }
+      ],
+      "imports": [
+        "vscode",
+        "./OutlineElement",
+        "./SvgOutlineParser"
+      ]
+    },
+    {
+      "path": "vscode-extension/src/SvgFileDecorationProvider.ts",
+      "category": "vscode",
+      "responsibility": "VSCode 文件标记与大纲",
+      "lines": 34,
+      "functions": 6,
+      "complexity": 11,
+      "units": [
+        {
+          "line": 9,
+          "complexity": 1
+        },
+        {
+          "line": 12,
+          "complexity": 1
+        },
+        {
+          "line": 13,
+          "complexity": 1
+        },
+        {
+          "line": 17,
+          "complexity": 6
+        },
+        {
+          "line": 29,
+          "complexity": 1
+        },
+        {
+          "line": 30,
+          "complexity": 1
+        }
+      ],
+      "imports": [
+        "vscode"
+      ]
+    },
+    {
+      "path": "vscode-extension/src/SvgOutlineParser.ts",
+      "category": "vscode",
+      "responsibility": "VSCode 文件标记与大纲",
+      "lines": 34,
+      "functions": 4,
+      "complexity": 10,
+      "units": [
+        {
+          "line": 5,
+          "complexity": 5
+        },
+        {
+          "line": 10,
+          "complexity": 1
+        },
+        {
+          "line": 11,
+          "complexity": 3
+        },
+        {
+          "line": 22,
+          "complexity": 1
+        }
+      ],
+      "imports": [
+        "sax",
+        "./OutlineElement"
+      ]
+    }
+  ]
+}

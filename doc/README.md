@@ -222,7 +222,7 @@ npm.cmd --prefix vscode-extension run test:in-process
 
 ## Phase 2 进展：CLI 扩展点
 
-四个扩展点、宿主整包注册事务和动态配置加载已接通，但实际可选插件和指标脚本尚未齐备，因此“框架可扩展”节点仍未全部验收完成。`box`、`stats`、`dir`、`modified-star` 与 `(box)` 标签均待接入。
+四个扩展点、宿主整包注册事务和动态配置加载已接通，指标首次产出见 [docs/metrics](../docs/metrics/README.md)。`box`、`stats`、`dir`、`modified-star` 与 `(box)` 标签均待接入；复合图形结构保护、保存点观察等通用能力仍需在实际插件接入前补齐，暂不据此宣称第二阶段完成。
 
 | 扩展点 | 职责与调用位置 | 实现与缺省行为 | 契约错误 |
 | --- | --- | --- | --- |
@@ -268,4 +268,17 @@ npm.cmd run test:in-process
 CLI 测试共 133 项通过：保留原有 95 项行为断言，新增 8 项图形、4 项命令、5 项属性、6 项树标签、7 项宿主事务及 8 项加载器测试。测试中的默认仓库、创建命令与分发器由 `test/support/Default*.ts` 显式装配，避免内核为兼容旧构造方式而重新依赖默认插件。
 
 回放脚本从 `final` 取出源码进行构建，在 `.cache/shape-compatibility/` 的两份独立工作目录运行真实 CLI 入口。相同输入包含 help、基础会话和流程图会话，输出逐字节一致；生成的 `demo.svg` 与 `flowchart.svg` 也逐字节一致。原有命令脚本只有命令和注释，不含提示符或示例输出。日志与临时产物不提交。
+
+### 自动指标与框架检查
+
+```powershell
+npm.cmd run metrics
+node --test --test-isolation=none scripts/metrics.test.mjs
+```
+
+指标由 `scripts/metrics.ps1` 从 Git 导出 final 与 HEAD 快照，再由 AST 脚本生成文件清单、模块职责、物理行数与函数圈复杂度。输出到题目指定的 `docs/metrics/`，按内核、装配处、CLI 插件拆分，VSCode 扩展单列。统计口径、真实提交哈希、逐文件与逐函数明细均随输出记录；不读取未提交源码，不手填数字。
+
+分析器使用固定的开发工具依赖 `typescript-analysis`（TypeScript 6.0.3 的 npm 别名）。它只用于指标解析，build/check 显式调用原 TypeScript 7 编译器，避免两个包提供同名 tsc 命令的冲突。4 项指标测试验证嵌套函数、字符串/注释/类型排除、顶层分支及循环等口径。
+
+脚本同时检查静态 import/export 的反向依赖，当前提交无内核导入插件或宿主、插件导入宿主的情况。加载器是否硬编码具体插件、公开能力边界及实际接入提交差异仍需人工检查。当前输出是阶段快照，最后需执行 `& ./scripts/metrics.ps1 -BaseRef final -TargetRef p2` 生成最终历史对比；输出自身的后续文档提交不改变目标源码指标，已有标签不移动。
 
