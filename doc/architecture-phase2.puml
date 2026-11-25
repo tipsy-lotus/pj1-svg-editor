@@ -1,5 +1,5 @@
 @startuml
-title Phase 2 当前框架（实际可选插件待接入）
+title Phase 2 当前框架（box 与树标签待接入）
 left to right direction
 package "启动与宿主\nsrc/main.ts, src/host" as Host {
   [组合根与默认装配] as Main
@@ -17,6 +17,8 @@ package "CLI 内核" as Core {
 package "CLI 插件\nplugins" as Plugins {
   [builtin-shapes] as Shapes
   [builtin-commands] as Commands
+  [stats] as Stats
+  [dir\nDirectoryAccess / NodeDirectoryAccess] as Dir
 }
 Main --> Loader
 Main --> Activation
@@ -46,6 +48,9 @@ Commands --> API
 Commands --> Cmd
 Commands --> Model
 Commands --> CLI : 公开 Token 类型
+Stats --> API
+Stats --> Model
+Dir --> API
 note bottom of Loader
   模块名动态解析；没有具体插件映射
 end note

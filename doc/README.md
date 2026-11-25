@@ -222,9 +222,9 @@ npm.cmd --prefix vscode-extension run test:in-process
 
 ## Phase 2 进展：CLI 扩展点
 
-四个扩展点、宿主整包注册事务、动态配置加载、复合图形结构保护和保存点观察已接通，指标首次产出见 [docs/metrics](../docs/metrics/README.md)。`box`、`stats`、`dir`、`modified-star` 与 `(box)` 标签均待接入，实际业务插件及完整双装配验收仍未完成。
+四个扩展点、宿主整包注册事务、动态配置加载、复合图形结构保护和保存点观察已接通，指标首次产出见 [docs/metrics](../docs/metrics/README.md)。`stats`、`dir` 已接入，`box`、`modified-star` 与 `(box)` 标签均待接入，完整双装配会话验收仍未完成。
 
-架构对照：[Phase 1 图源](architecture.puml) → [Phase 2 当前框架图源](architecture-phase2.puml)。本次变化是将具体图形与命令注册移到插件包，宿主承担选择和加载，内核通过公开契约调用；配置加载器和整包激活事务属于宿主。当前图仅描述已实现部分，后续补上实际可选插件。
+架构对照：[Phase 1 图源](architecture.puml) → [Phase 2 当前框架图源](architecture-phase2.puml)。本次变化是将具体图形与命令注册移到插件包，宿主承担选择和加载，内核通过公开契约调用；配置加载器和整包激活事务属于宿主。当前图包含 stats、dir，后续补上 box 与树标签。
 
 | 扩展点 | 职责与调用位置 | 实现与缺省行为 | 契约错误 |
 | --- | --- | --- | --- |
@@ -253,7 +253,7 @@ npm.cmd --prefix vscode-extension run test:in-process
 npm.cmd run cli -- --config plugins.config.json
 ```
 
-根目录配置当前是 `{ "plugins": [] }`，保持原有能力。每项包含字符串 module、可选布尔 enabled 和任意 options；`enabled: false` 完全跳过解析与导入。配置先整体检查，语法或结构错误输出 `error: invalid plugin config`，不加载其中任何条目，继续提供默认内置能力。
+根目录配置按顺序加载 `./plugins/stats` 和 `./plugins/dir`，分别追加统计与目录命令；不传 --config 时仍仅装配内置能力。每项包含字符串 module、可选布尔 enabled 和任意 options；`enabled: false` 完全跳过解析与导入。配置先整体检查，语法或结构错误输出 `error: invalid plugin config`，不加载其中任何条目，继续提供默认内置能力。
 
 相对路径以配置文件目录为基准，支持文件入口或带 package.json 的目录；包名通过 Node `createRequire(configFile).resolve` 解析，采用该 API 的 main/exports require 条件，然后动态 import 已解析入口。插件应声明可解析的 JavaScript 入口（TypeScript 源码先构建），入口导出实现 activate 的默认实例。目录请求读取该目录的 package.json，文件/包入口查找最近的 package.json 清单。加载器不按插件名称映射或导入具体实现。
 
@@ -269,9 +269,46 @@ npm.cmd run test:in-process
 & ./scripts/check-phase1.ps1
 ```
 
-CLI 测试共 139 项通过：保留原有 95 项行为断言，新增 8 项图形、4 项命令、5 项属性、6 项树标签、7 项宿主事务、8 项加载器及 6 项通用能力测试。测试中的默认仓库、创建命令与分发器由 `test/support/Default*.ts` 显式装配，避免内核为兼容旧构造方式而重新依赖默认插件。
+CLI 测试共 152 项通过：保留原有 95 项行为断言，新增 8 项图形、4 项命令、5 项属性、6 项树标签、7 项宿主事务、8 项加载器、6 项通用能力、6 项 stats 及 7 项 dir 插件测试。测试中的默认仓库、创建命令与分发器由 `test/support/Default*.ts` 显式装配，避免内核为兼容旧构造方式而重新依赖默认插件。
+
+### stats 命令插件
+
+`plugins/stats` 是独立插件包，贡献类实例 StatsCommand，命令名、零参数规则与 help 文案均在插件侧声明。StatsPlugin 只依赖公开接口与领域抽象，统计从画布子节点按顺序深度优先遍历：叶子按 tag 计数，类型按首次出现顺序输出；所有容器只计 containers，根 SVG 不计，复合容器内部叶子照常计数。
+
+使用 `npm.cmd run cli -- --config plugins.config.json` 后可执行 stats；禁用该条目或不传配置时，命令不出现在 help 中，执行报未知命令。空文档输出 `(total 0, containers 0)`，未初始化时报原有的无文档错误。统计使用公开文档查询，不提交编辑事务、不改变保存点或历史。
+
+独立测试入口：先运行 `npm.cmd run build`，再运行 `node --test --test-isolation=none dist/test/stats-plugin.test.js`。测试包含嵌套遍历、类型顺序、容器和空文档、禁用与 help、历史屏障与 redo，以及同一实现的代码/配置装配输出对比。本次仅新增插件、测试和文档，并修改配置，没有修改内核、加载器或既有插件，作为配置接入方式的增量记录。完整会话证据和代码接入方式的独立提交差异仍需后续补充。
 
 回放脚本从 `final` 取出源码进行构建，在 `.cache/shape-compatibility/` 的两份独立工作目录运行真实 CLI 入口。相同输入包含 help、基础会话和流程图会话，输出逐字节一致；生成的 `demo.svg` 与 `flowchart.svg` 也逐字节一致。原有命令脚本只有命令和注释，不含提示符或示例输出。日志与临时产物不提交。
+
+### dir 插件与目录适配器
+
+`plugins/dir` 独立贡献 DirCommand，零参数、不要求 SVG 文档。命令查询执行时的进程工作目录，read/save 不改变该目录；只列直接子项，包含隐藏项，不列点目录，也不递归。目录在前、普通文件在后，各组按 UTF-16 字符串顺序升序排列，避免 locale 引入不同输出。符号链接不跟随目标，单列为 `[LINK]`，其余特殊项为 `[OTHER]`，排在普通文件之后。
+
+| 适配器角色 | 接口或类 | 职责 |
+| --- | --- | --- |
+| Client | DirCommand | 调用目录接口，排序并生成固定格式输出 |
+| Target | DirectoryAccess | 提供 currentDirectory/list，不暴露 Node Dirent |
+| Adapter | NodeDirectoryAccess | 将 Node 目录项转换为 DirectoryEntry |
+| Adaptee | Node fs.readdirSync 与 process.cwd | 实际目录读取及工作目录查询 |
+
+DirPlugin 默认注入真实适配器，测试可注入 MemoryDirectoryAccess，代码与配置装配使用同一个 DirPlugin/DirCommand/DirectoryAccess。空目录输出 `(empty directory)`，读取失败报 `error: cannot read directory: <path>`，CLI 随后仍可处理其他命令。查询不调用会话编辑入口，不改变文档、保存点、当前 SVG 路径或历史；插件只在自身包中访问文件系统。
+
+独立测试：先构建，再执行 `node --test --test-isolation=none dist/test/dir-plugin.test.js`。覆盖混合项、隐藏项、稳定排序、空目录、读取失败、无文档使用、参数与 help、成功/失败均保留 redo 和历史屏障；真实临时目录验证命令与适配器组合。两种装配对同一固定目录输出逐字节一致，日志位于被列目录之外。临时文件位于忽略的 `.cache/`。本次运行代码只新增 dir 插件并修改配置，内核、加载器、stats 和内置插件均未修改。
+
+### 命令插件完整会话证据
+
+```powershell
+npm.cmd run build
+node scripts/replay-command-plugins.mjs
+node --test --test-isolation=none scripts/command-session.test.mjs
+```
+
+`doc/transcript/command-plugins.txt` 只包含命令与注释；`fixtures/command-input.svg` 是独立初始 SVG。两份实际输出保存为 `command-plugins.code.txt` 和 `command-plugins.config.txt`，生成图形另存为 `command-plugins.saved.svg`。配置输入也单独保存，不将输出混入输入。
+
+回放器在同一份固定临时工作目录内依次执行两种装配，使用同一批插件、顺序、options、真实文件适配器和 REPL。覆盖无文档 dir、混合目录及隐藏项、stats、保存、移动、撤销重做和读回。日志与保存文件位于被列目录之外；回放前后检查目录子项不变，四次 dir 内容一致，两种装配的输出与 SVG 字节均一致。新增 1 项会话测试独立于 152 项 CLI 测试运行。
+
+这份材料证明两种装配的运行行为一致，不替代题目要求的独立代码装配接入提交差异。stats 与 dir 的当前接入提交仅新增插件并修改配置，未修改内核、加载器或既有插件；后续仍须为代码装配方式保留相应历史证据，并补齐 box 会话。
 
 ### 自动指标与框架检查
 

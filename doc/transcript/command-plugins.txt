@@ -1,0 +1,19 @@
+# 固定目录：docs/、.hidden、example.svg；日志和保存文件位于目录之外
+dir
+init
+create rect r 0 0 100 50
+create g group
+create circle c 100 100 20 in group
+stats
+save ../session.svg
+dir
+move r 5 0
+dir
+undo
+stats
+redo
+stats
+read example.svg
+stats
+dir
+quit

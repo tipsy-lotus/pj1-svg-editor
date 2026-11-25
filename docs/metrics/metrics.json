@@ -2,7 +2,7 @@
   "baseRef": "final",
   "targetRef": "HEAD",
   "baseCommit": "ce4e37a49d1d3527ea680358810e37cb99f7b654",
-  "targetCommit": "a8373116e6c3ffd480d0e498da20b656654e9d7d",
+  "targetCommit": "df931623c9c5461a3d479e0bac4dc90f834f22a8",
   "forbiddenStaticDependencies": [],
   "base": [
     {
@@ -1509,6 +1509,165 @@
         "../../../src/model/Text.js",
         "../../../src/model/Group.js",
         "./BuiltinShapeProvider.js"
+      ]
+    },
+    {
+      "path": "plugins/dir/src/DirCommand.ts",
+      "category": "plugins",
+      "responsibility": "插件包 dir",
+      "lines": 20,
+      "functions": 5,
+      "complexity": 11,
+      "units": [
+        {
+          "line": 9,
+          "complexity": 1
+        },
+        {
+          "line": 10,
+          "complexity": 3
+        },
+        {
+          "line": 15,
+          "complexity": 2
+        },
+        {
+          "line": 16,
+          "complexity": 4
+        },
+        {
+          "line": 17,
+          "complexity": 1
+        }
+      ],
+      "imports": [
+        "../../../src/extensions/Command.js",
+        "./DirectoryAccess.js"
+      ]
+    },
+    {
+      "path": "plugins/dir/src/DirectoryAccess.ts",
+      "category": "plugins",
+      "responsibility": "插件包 dir",
+      "lines": 6,
+      "functions": 0,
+      "complexity": 0,
+      "units": [],
+      "imports": [
+        "./DirectoryEntry.js"
+      ]
+    },
+    {
+      "path": "plugins/dir/src/DirectoryEntry.ts",
+      "category": "plugins",
+      "responsibility": "插件包 dir",
+      "lines": 4,
+      "functions": 0,
+      "complexity": 0,
+      "units": [],
+      "imports": []
+    },
+    {
+      "path": "plugins/dir/src/DirPlugin.ts",
+      "category": "plugins",
+      "responsibility": "插件包 dir",
+      "lines": 14,
+      "functions": 2,
+      "complexity": 2,
+      "units": [
+        {
+          "line": 8,
+          "complexity": 1
+        },
+        {
+          "line": 9,
+          "complexity": 1
+        }
+      ],
+      "imports": [
+        "../../../src/extensions/Plugin.js",
+        "../../../src/extensions/Command.js",
+        "./DirectoryAccess.js",
+        "./NodeDirectoryAccess.js",
+        "./DirCommand.js"
+      ]
+    },
+    {
+      "path": "plugins/dir/src/NodeDirectoryAccess.ts",
+      "category": "plugins",
+      "responsibility": "插件包 dir",
+      "lines": 14,
+      "functions": 3,
+      "complexity": 6,
+      "units": [
+        {
+          "line": 7,
+          "complexity": 1
+        },
+        {
+          "line": 8,
+          "complexity": 1
+        },
+        {
+          "line": 9,
+          "complexity": 4
+        }
+      ],
+      "imports": [
+        "node:fs",
+        "./DirectoryAccess.js",
+        "./DirectoryEntry.js"
+      ]
+    },
+    {
+      "path": "plugins/stats/src/StatsCommand.ts",
+      "category": "plugins",
+      "responsibility": "插件包 stats",
+      "lines": 25,
+      "functions": 4,
+      "complexity": 6,
+      "units": [
+        {
+          "line": 10,
+          "complexity": 1
+        },
+        {
+          "line": 11,
+          "complexity": 1
+        },
+        {
+          "line": 15,
+          "complexity": 3
+        },
+        {
+          "line": 21,
+          "complexity": 1
+        }
+      ],
+      "imports": [
+        "../../../src/extensions/Command.js",
+        "../../../src/extensions/EditorAccess.js",
+        "../../../src/model/Shape.js"
+      ]
+    },
+    {
+      "path": "plugins/stats/src/StatsPlugin.ts",
+      "category": "plugins",
+      "responsibility": "插件包 stats",
+      "lines": 12,
+      "functions": 1,
+      "complexity": 1,
+      "units": [
+        {
+          "line": 7,
+          "complexity": 1
+        }
+      ],
+      "imports": [
+        "../../../src/extensions/Plugin.js",
+        "../../../src/extensions/Command.js",
+        "../../../src/extensions/EditorAccess.js",
+        "./StatsCommand.js"
       ]
     },
     {
