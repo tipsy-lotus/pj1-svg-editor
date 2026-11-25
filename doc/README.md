@@ -222,7 +222,7 @@ npm.cmd --prefix vscode-extension run test:in-process
 
 ## Phase 2 进展：CLI 扩展点
 
-四个扩展点、宿主整包注册事务和动态配置加载已接通，指标首次产出见 [docs/metrics](../docs/metrics/README.md)。`box`、`stats`、`dir`、`modified-star` 与 `(box)` 标签均待接入；复合图形结构保护、保存点观察等通用能力仍需在实际插件接入前补齐，暂不据此宣称第二阶段完成。
+四个扩展点、宿主整包注册事务、动态配置加载、复合图形结构保护和保存点观察已接通，指标首次产出见 [docs/metrics](../docs/metrics/README.md)。`box`、`stats`、`dir`、`modified-star` 与 `(box)` 标签均待接入，实际业务插件及完整双装配验收仍未完成。
 
 | 扩展点 | 职责与调用位置 | 实现与缺省行为 | 契约错误 |
 | --- | --- | --- | --- |
@@ -235,7 +235,9 @@ npm.cmd --prefix vscode-extension run test:in-process
 
 属性处理器通过 `AttributeContext` 使用公开领域方法，整条调用包在一个 `SetCommand` 快照事务中；即使改动多个子部件，也能一次撤销或重做。冲突统一拒绝，部分失败整体恢复；具体约定见 [ADR 002](adr/002-attribute-handler.md)。
 
-树标签通过 `TreeContext` 接收当前文档与当前图形，SVG 根行的图形为 undefined，指定子树的首行则传入该图形。标签只能读取文档，自身状态放在实例字段内。多个标签按注册顺序以一个空格连接；undefined、空串或纯空白不追加后缀，标签首尾空白被去除。渲染失败不会输出部分树；框架不提供对任意插件副作用的沙箱隔离。dirty 判定、祖先传播和保存点观察能力将在实际标签插件接入前确定并验证。
+树标签通过 `TreeContext` 接收当前文档、当前图形及上次成功 read/save 的隔离快照，SVG 根行的图形为 undefined，指定子树的首行则传入该图形。标签只能读取文档，自身状态放在实例字段内。多个标签按注册顺序以一个空格连接；undefined、空串或纯空白不追加后缀，标签首尾空白被去除。渲染失败不会输出部分树；框架不提供对任意插件副作用的沙箱隔离。
+
+后续 dirty 标签采用内容对比语义，传播到祖先，undo 回到保存点时消失；新建未保存内容立即标记。会话只在成功 read/save 时更新内部保存点，init 清除；getter 返回克隆。复合容器通过 assertCanRemove/assertCanUngroup 保护必要子部件，通过 treeLabel/creationMessage 自定义显示，无需内核按插件名称分派。取舍及验证见 [ADR 004](adr/004-saved-state.md)，实际 box 与 modified-star 插件尚未实现。
 
 依赖方向为：`main/host → 内核与插件`，`builtin-shapes → ShapeProvider 与公开领域类`，内核通过接口调用提供器，不反向导入插件或宿主。创建、读回共用注册表。读回先完成子树解析，再由提供器构造完整对象；优先级与降级决策见 [ADR 001](adr/001-shape-provider.md)。
 
@@ -265,7 +267,7 @@ npm.cmd run test:in-process
 & ./scripts/check-phase1.ps1
 ```
 
-CLI 测试共 133 项通过：保留原有 95 项行为断言，新增 8 项图形、4 项命令、5 项属性、6 项树标签、7 项宿主事务及 8 项加载器测试。测试中的默认仓库、创建命令与分发器由 `test/support/Default*.ts` 显式装配，避免内核为兼容旧构造方式而重新依赖默认插件。
+CLI 测试共 139 项通过：保留原有 95 项行为断言，新增 8 项图形、4 项命令、5 项属性、6 项树标签、7 项宿主事务、8 项加载器及 6 项通用能力测试。测试中的默认仓库、创建命令与分发器由 `test/support/Default*.ts` 显式装配，避免内核为兼容旧构造方式而重新依赖默认插件。
 
 回放脚本从 `final` 取出源码进行构建，在 `.cache/shape-compatibility/` 的两份独立工作目录运行真实 CLI 入口。相同输入包含 help、基础会话和流程图会话，输出逐字节一致；生成的 `demo.svg` 与 `flowchart.svg` 也逐字节一致。原有命令脚本只有命令和注释，不含提示符或示例输出。日志与临时产物不提交。
 

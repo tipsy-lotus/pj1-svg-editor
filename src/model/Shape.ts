@@ -17,6 +17,8 @@ export abstract class Shape {
   }
 
   get label(): string { return `${this.tag}#${this.id}`; }
+  get treeLabel(): string { return this.label; }
+  get creationMessage(): string { return `${this.label} created`; }
   get text(): string { return this.content; }
   get supportsText(): boolean { return this.acceptsText(); }
   get children(): readonly Shape[] { return []; }
@@ -65,6 +67,9 @@ export abstract class Shape {
 
   add(_child: Shape, _index?: number): void { throw new Error(`not a container: ${this.id}`); }
   remove(_child: Shape): void { throw new Error(`not a container: ${this.id}`); }
+  /** 复合容器可覆盖，阻止普通结构命令移走必要子部件。 */
+  assertCanRemove(_child: Shape): void {}
+  assertCanUngroup(): void {}
   protected acceptsText(): boolean { return false; }
   protected copyTo<T extends Shape>(target: T): T {
     target.importAttributes(this.attributes);

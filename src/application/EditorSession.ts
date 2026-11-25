@@ -6,6 +6,7 @@ import { SvgDocument } from '../model/SvgDocument.js';
 export class EditorSession {
   private current?: SvgDocument;
   private readPath?: string;
+  private saved?: SvgDocument;
   private readonly history = new History();
 
   constructor(private readonly repository: SvgFileRepository) {}
@@ -16,16 +17,19 @@ export class EditorSession {
   }
 
   get currentPath(): string | undefined { return this.readPath; }
+  /** 返回隔离快照，观察者不能改写会话内部的保存点。 */
+  get savedDocument(): SvgDocument | undefined { return this.saved?.clone(); }
 
   init(width = 800, height = 600): string {
     const document = new SvgDocument(width, height);
-    this.current = document; this.readPath = undefined; this.history.barrier();
+    this.current = document; this.readPath = undefined; this.saved = undefined; this.history.barrier();
     return `canvas ${document.width}x${document.height} created`;
   }
 
   read(path: string): readonly string[] {
     const { document, warnings } = this.repository.read(path);
-    this.current = document; this.readPath = path; this.history.barrier();
+    const saved = document.clone();
+    this.current = document; this.readPath = path; this.saved = saved; this.history.barrier();
     return [...warnings, `read ${path} (${document.all().length} elements)`];
   }
 
@@ -33,7 +37,9 @@ export class EditorSession {
     const document = this.document;
     const target = path ?? this.readPath;
     if (target === undefined) throw new Error("no read path. specify 'save <file.svg>'");
+    const saved = document.clone();
     this.repository.save(document, target);
+    this.saved = saved;
     this.history.barrier();
     return `saved to ${target} (${document.all().length} elements)`;
   }

@@ -5,6 +5,7 @@ import type { Command as UndoableCommand } from '../commands/Command.js';
 export interface EditorAccess {
   readonly document: SvgDocument;
   readonly currentPath: string | undefined;
+  readonly savedDocument: SvgDocument | undefined;
   init(width?: number, height?: number): string;
   read(path: string): readonly string[];
   save(path?: string): string;

@@ -10,6 +10,6 @@ export class CreateCommand extends EditCommand {
     document.assertAvailable(this.id);
     const shape = this.factory.create(this.type, this.id, this.params);
     document.insert(shape, this.parentId);
-    return `${shape.label} created${this.parentId !== undefined ? ` in g#${this.parentId}` : ''}`;
+    return `${shape.creationMessage}${this.parentId !== undefined ? ` in g#${this.parentId}` : ''}`;
   }
 }

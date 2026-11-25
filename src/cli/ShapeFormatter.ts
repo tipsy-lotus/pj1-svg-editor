@@ -3,15 +3,17 @@ import type { SvgDocument } from '../model/SvgDocument.js';
 import { TreeDecoratorRegistry } from '../extensions/TreeDecoratorRegistry.js';
 
 export class ShapeFormatter {
-  constructor(private readonly decorators = new TreeDecoratorRegistry()) {}
+  constructor(private readonly decorators = new TreeDecoratorRegistry(),
+    private readonly saved: () => SvgDocument | undefined = () => undefined) {}
   tree(document: SvgDocument, id?: string): string {
     const root = id === undefined ? undefined : document.find(id);
+    const savedDocument = this.saved();
     const lines = [(root ? this.inline(root) : `svg (${document.width}x${document.height})`)
-      + this.decorators.suffix({ document, shape: root })];
+      + this.decorators.suffix({ document, shape: root, savedDocument })];
     const visit = (children: readonly Shape[], prefix: string): void => {
       children.forEach((shape, index) => {
         const last = index === children.length - 1;
-        lines.push(`${prefix}${last ? '└── ' : '├── '}${this.inline(shape)}${this.decorators.suffix({ document, shape })}`);
+        lines.push(`${prefix}${last ? '└── ' : '├── '}${this.inline(shape)}${this.decorators.suffix({ document, shape, savedDocument })}`);
         visit(shape.children, prefix + (last ? '    ' : '│   '));
       });
     };
@@ -30,7 +32,7 @@ export class ShapeFormatter {
 
   private inline(shape: Shape): string {
     const attributes = this.attributes(shape);
-    return shape.label + (attributes ? `  ${attributes}` : '') + (shape.supportsText ? ` ${JSON.stringify(shape.text)}` : '');
+    return shape.treeLabel + (attributes ? `  ${attributes}` : '') + (shape.supportsText ? ` ${JSON.stringify(shape.text)}` : '');
   }
 
   private attributes(shape: Shape): string {

@@ -20,7 +20,7 @@ export class CommandDispatcher {
   readonly context: CommandContext;
 
   constructor(session: EditorAccess, shapes: ShapeFactory, attributes = new AttributeRegistry(), decorators = new TreeDecoratorRegistry()) {
-    this.formatter = new ShapeFormatter(decorators);
+    this.formatter = new ShapeFormatter(decorators, () => session.savedDocument);
     this.context = {
       session, shapes, attributes,
       registerCommand: command => this.register(command),

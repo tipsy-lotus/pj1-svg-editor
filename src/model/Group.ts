@@ -14,6 +14,7 @@ export class Group extends Shape {
   override remove(child: Shape): void {
     const index = this.members.indexOf(child);
     if (index < 0) throw new Error(`shape not in container: ${child.id}`);
+    this.assertCanRemove(child);
     this.members.splice(index, 1);
   }
   override move(dx: number, dy: number): void {
