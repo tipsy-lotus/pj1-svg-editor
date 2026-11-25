@@ -81,15 +81,20 @@ export class SvgDocument {
     const destination = sameParent ? firstParent : this.root;
     const position = sameParent ? destination.children.indexOf(ordered[0]!) : destination.children.length;
     const group = new Group(id);
+    // 先检查所有来源容器，再修改任何父子关系。
+    ordered.forEach(node => this.parent(node).assertCanRemove(node));
     for (const node of ordered) { this.parent(node).remove(node); group.add(node); }
     destination.add(group, sameParent ? position : destination.children.length);
     return group;
   }
   ungroup(id: string): void {
     const group = this.container(id);
+    group.assertCanUngroup();
     const parent = this.parent(group);
     if (parent === this.root) throw new Error(`cannot ungroup top-level container: ${id}`);
     const index = parent.children.indexOf(group);
+    parent.assertCanRemove(group);
+    group.children.forEach(child => group.assertCanRemove(child));
     parent.remove(group);
     group.children.forEach((child, offset) => { group.remove(child); parent.add(child, index + offset); });
   }

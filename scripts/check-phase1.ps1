@@ -11,7 +11,7 @@ try {
   git archive --format=zip --output=$replayArchive final
   if ($LASTEXITCODE -ne 0) { throw 'Cannot export final baseline' }
   Expand-Archive -LiteralPath $replayArchive -DestinationPath $replayBaseline -Force
-  & ./node_modules/.bin/tsc.cmd -p (Join-Path $replayBaseline 'tsconfig.json')
+  node ./node_modules/typescript/bin/tsc -p (Join-Path $replayBaseline 'tsconfig.json')
   if ($LASTEXITCODE -ne 0) { throw 'Baseline build failed' }
   npm.cmd run build --silent
   if ($LASTEXITCODE -ne 0) { throw 'Current build failed' }

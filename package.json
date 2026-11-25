@@ -8,18 +8,20 @@
     "node": ">=22"
   },
   "scripts": {
-    "build": "tsc -p tsconfig.json",
+    "build": "node node_modules/typescript/bin/tsc -p tsconfig.json",
     "cli": "npm run build --silent && node dist/src/main.js",
     "demo": "npm run build --silent && node dist/src/main.js < examples/flowchart.cli",
     "test": "npm run build --silent && node --test dist/test/*.test.js",
     "test:in-process": "npm run build --silent && node --test --test-isolation=none dist/test/*.test.js",
-    "check": "tsc -p tsconfig.json --noEmit"
+    "check": "node node_modules/typescript/bin/tsc -p tsconfig.json --noEmit",
+    "metrics": "powershell -NoProfile -File scripts/metrics.ps1"
   },
   "dependencies": {
     "xml-js": "1.6.11"
   },
   "devDependencies": {
     "@types/node": "^26.6.5",
-    "typescript": "^7.0.2"
+    "typescript": "^7.0.2",
+    "typescript-analysis": "npm:typescript@6.0.3"
   }
 }

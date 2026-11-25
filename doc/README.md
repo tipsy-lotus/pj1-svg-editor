@@ -220,15 +220,46 @@ npm.cmd --prefix vscode-extension run test:in-process
 | 大纲排查 | 根据实际反馈补充当前文本文件、匹配状态和解析结果的诊断；启动时自动打开示例，并在示例工作区指定 SVG 使用文本编辑器 | 调整后，我确认大纲能够显示和定位；原先未显示的具体原因未完全确认 |
 | 异常与恢复 | 建议将编辑更新、不完整 XML 和恢复分开留证 | 我验证未保存编辑也会更新；删除 `</svg>` 后本扩展大纲清空，恢复后节点重新出现，随后恢复并保存原示例 |
 
-## Phase 2 进展：CLI 图形扩展点
+## Phase 2 进展：CLI 扩展点
 
-本次先拆分图形名称分派，尚未达到“四个扩展点齐备”的节点。命令注册、属性处理器、树标签、统一加载与回滚、指标脚本仍待实现，`box`、`stats`、`dir` 也尚未接入。
+四个扩展点、宿主整包注册事务、动态配置加载、复合图形结构保护和保存点观察已接通，指标首次产出见 [docs/metrics](../docs/metrics/README.md)。`box`、`stats`、`dir`、`modified-star` 与 `(box)` 标签均待接入，实际业务插件及完整双装配验收仍未完成。
+
+架构对照：[Phase 1 图源](architecture.puml) → [Phase 2 当前框架图源](architecture-phase2.puml)。本次变化是将具体图形与命令注册移到插件包，宿主承担选择和加载，内核通过公开契约调用；配置加载器和整包激活事务属于宿主。当前图仅描述已实现部分，后续补上实际可选插件。
 
 | 扩展点 | 职责与调用位置 | 实现与缺省行为 | 契约错误 |
 | --- | --- | --- | --- |
-| `ShapeProvider` | `ShapeFactory.create/fromSvg` 调用创建和读回；`CommandDispatcher.help` 读取提供器文案 | `plugins/builtin-shapes` 注册六类；宿主 `DefaultShapes` 默认装配；空注册表能启动，但创建或读回未注册类型时报未知图形 | 重名拒绝；元数据/方法非法拒绝；最高读回优先级并列拒绝；返回类型或 id 错误拒绝；提供器抛错保留原文档及历史 |
+| `ShapeProvider` | `ShapeFactory.create/fromSvg` 调用创建和读回；`BuiltinCommandsPlugin.help` 读取提供器文案 | `plugins/builtin-shapes` 注册六类；宿主 `DefaultShapes` 默认装配；空注册表能启动，但创建或读回未注册类型时报未知图形 | 重名拒绝；元数据/方法非法拒绝；最高读回优先级并列拒绝；返回类型或 id 错误拒绝；提供器抛错保留原文档及历史 |
+| `Command` | `CommandDispatcher.execute` 查询注册表、校验插件声明的参数数量并调用 `run`；内置 help 从上下文读取注册集合 | `plugins/builtin-commands` 提供原有 21 个命令名（含 exit 别名），由宿主 `DefaultDispatcher` 装配；空注册表能启动，未注册命令报未知命令 | 重名或非法参数规则拒绝注册；非法返回值报错；执行异常转为 error 信息，后续命令仍可运行 |
+| `AttributeHandler` | `SetCommand.apply → AttributeRegistry.apply` 定位目标、检查命中并执行处理器 | 当前以独立类替身验证，实际 box 处理器待接入；缺省空注册表使用 Phase 1 白名单 | 同名或非法注册拒绝；多个命中拒绝；判断或应用抛错时文档与历史恢复，不回退默认处理 |
+| `TreeDecorator` | `ShapeFormatter.tree → TreeDecoratorRegistry.suffix` 为根行、子树首行及后代行生成后缀 | 当前以独立类替身验证，实际标签插件待接入；缺省不追加任何字符，show 不受影响 | 同名或非法注册拒绝；非字符串或含换行/制表符的标签拒绝；异常交由 CLI 输出 error，不返回半棵树 |
 
-依赖方向为：`main/host → 内核与插件`，`builtin-shapes → ShapeProvider 与公开领域类`，内核通过接口调用提供器，不反向导入插件或宿主。创建、读回共用注册表。读回先完成子树解析，再由提供器构造完整对象；优先级与降级决策见 [ADR 001](adr/001-shape-provider.md)。当前内置插件入口仍是直接代码装配，后续接入统一加载事务，尚不声称已满足配置装配要求。
+命令插件通过公开的 `CommandContext` 和 `EditorAccess` 接口使用会话、图形注册表、结构展示和关闭能力，不访问历史栈或仓库字段。`src/extensions/Command` 描述 CLI 调用；`src/commands/Command` 保留可撤销编辑事务，查询命令无需进入历史。
+
+属性处理器通过 `AttributeContext` 使用公开领域方法，整条调用包在一个 `SetCommand` 快照事务中；即使改动多个子部件，也能一次撤销或重做。冲突统一拒绝，部分失败整体恢复；具体约定见 [ADR 002](adr/002-attribute-handler.md)。
+
+树标签通过 `TreeContext` 接收当前文档、当前图形及上次成功 read/save 的隔离快照，SVG 根行的图形为 undefined，指定子树的首行则传入该图形。标签只能读取文档，自身状态放在实例字段内。多个标签按注册顺序以一个空格连接；undefined、空串或纯空白不追加后缀，标签首尾空白被去除。渲染失败不会输出部分树；框架不提供对任意插件副作用的沙箱隔离。
+
+后续 dirty 标签采用内容对比语义，传播到祖先，undo 回到保存点时消失；新建未保存内容立即标记。会话只在成功 read/save 时更新内部保存点，init 清除；getter 返回克隆。复合容器通过 assertCanRemove/assertCanUngroup 保护必要子部件，通过 treeLabel/creationMessage 自定义显示，无需内核按插件名称分派。取舍及验证见 [ADR 004](adr/004-saved-state.md)，实际 box 与 modified-star 插件尚未实现。
+
+依赖方向为：`main/host → 内核与插件`，`builtin-shapes → ShapeProvider 与公开领域类`，内核通过接口调用提供器，不反向导入插件或宿主。创建、读回共用注册表。读回先完成子树解析，再由提供器构造完整对象；优先级与降级决策见 [ADR 001](adr/001-shape-provider.md)。
+
+真实 CLI 入口通过 `PluginHost.activate` 进行代码装配，内置插件读取各自 package.json 清单。四类贡献先暂存，激活完成后按类别和名称集合校验，通过后一起发布；重名、清单不符或激活失败均丢弃当前插件贡献，保留已有成功插件。异步激活与并发请求按顺序处理，options 原样传入，激活结束后禁止追加注册。详细边界见 [ADR 003](adr/003-plugin-registration.md)。
+
+### 配置装配
+
+默认启动使用代码装配的内置能力；显式指定配置后，按数组顺序追加可选插件：
+
+```powershell
+npm.cmd run cli -- --config plugins.config.json
+```
+
+根目录配置当前是 `{ "plugins": [] }`，保持原有能力。每项包含字符串 module、可选布尔 enabled 和任意 options；`enabled: false` 完全跳过解析与导入。配置先整体检查，语法或结构错误输出 `error: invalid plugin config`，不加载其中任何条目，继续提供默认内置能力。
+
+相对路径以配置文件目录为基准，支持文件入口或带 package.json 的目录；包名通过 Node `createRequire(configFile).resolve` 解析，采用该 API 的 main/exports require 条件，然后动态 import 已解析入口。插件应声明可解析的 JavaScript 入口（TypeScript 源码先构建），入口导出实现 activate 的默认实例。目录请求读取该目录的 package.json，文件/包入口查找最近的 package.json 清单。加载器不按插件名称映射或导入具体实现。
+
+顶层模块不存在报 `error: plugin not found: <module>`，无默认导出报 `error: plugin has no default export: <module>`；入口损坏、依赖缺失、求值异常或非法默认实例报激活失败，不误报顶层模块不存在。其余清单不符、重复注册和激活异常由同一个 PluginHost 处理。诊断写入 stderr，随后仍进入 CLI；CLI 命令自身的退出码规则保留。
+
+已用临时测试插件验证代码/配置装配输出逐字节一致、配置目录路径和包名解析，以及四条失败路径、重复注册回滚、禁用、options 和配置整体预检。实际 stats、dir、box 会话与固定目录的双装配验证尚未完成，不能用此测试替代最终验收。
 
 验证命令：
 
@@ -238,7 +269,20 @@ npm.cmd run test:in-process
 & ./scripts/check-phase1.ps1
 ```
 
-CLI 测试共 103 项通过：保留原有 95 项行为断言，新增 8 项图形扩展点测试。测试中的默认仓库、创建命令与分发器由 `test/support/Default*.ts` 显式装配，避免内核为兼容旧构造方式而重新依赖默认插件。
+CLI 测试共 139 项通过：保留原有 95 项行为断言，新增 8 项图形、4 项命令、5 项属性、6 项树标签、7 项宿主事务、8 项加载器及 6 项通用能力测试。测试中的默认仓库、创建命令与分发器由 `test/support/Default*.ts` 显式装配，避免内核为兼容旧构造方式而重新依赖默认插件。
 
 回放脚本从 `final` 取出源码进行构建，在 `.cache/shape-compatibility/` 的两份独立工作目录运行真实 CLI 入口。相同输入包含 help、基础会话和流程图会话，输出逐字节一致；生成的 `demo.svg` 与 `flowchart.svg` 也逐字节一致。原有命令脚本只有命令和注释，不含提示符或示例输出。日志与临时产物不提交。
+
+### 自动指标与框架检查
+
+```powershell
+npm.cmd run metrics
+node --test --test-isolation=none scripts/metrics.test.mjs
+```
+
+指标由 `scripts/metrics.ps1` 从 Git 导出 final 与 HEAD 快照，再由 AST 脚本生成文件清单、模块职责、物理行数与函数圈复杂度。输出到题目指定的 `docs/metrics/`，按内核、装配处、CLI 插件拆分，VSCode 扩展单列。统计口径、真实提交哈希、逐文件与逐函数明细均随输出记录；不读取未提交源码，不手填数字。
+
+分析器使用固定的开发工具依赖 `typescript-analysis`（TypeScript 6.0.3 的 npm 别名）。它只用于指标解析，build/check 显式调用原 TypeScript 7 编译器，避免两个包提供同名 tsc 命令的冲突。4 项指标测试验证嵌套函数、字符串/注释/类型排除、顶层分支及循环等口径。
+
+脚本同时检查静态 import/export 的反向依赖，当前提交无内核导入插件或宿主、插件导入宿主的情况。加载器是否硬编码具体插件、公开能力边界及实际接入提交差异仍需人工检查。当前输出是阶段快照，最后需执行 `& ./scripts/metrics.ps1 -BaseRef final -TargetRef p2` 生成最终历史对比；输出自身的后续文档提交不改变目标源码指标，已有标签不移动。
 
