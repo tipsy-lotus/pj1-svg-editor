@@ -9,6 +9,10 @@ import { TreeDecoratorRegistry } from '../extensions/TreeDecoratorRegistry.js';
 
 export class CommandDispatcher {
   private readonly registered = new Map<string, Command>();
+  checkpoint(): () => void {
+    const before = [...this.registered.entries()];
+    return () => { this.registered.clear(); before.forEach(([name, value]) => this.registered.set(name, value)); };
+  }
   private readonly tokenizer = new Tokenizer();
   private readonly formatter: ShapeFormatter;
   private closed = false;

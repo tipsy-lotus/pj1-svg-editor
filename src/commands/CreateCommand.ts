@@ -3,7 +3,7 @@ import type { ShapeFactory } from '../model/ShapeFactory.js';
 import type { SvgDocument } from '../model/SvgDocument.js';
 export class CreateCommand extends EditCommand {
   readonly description: string;
-  constructor(private readonly factory: ShapeFactory, private readonly type: string, private readonly id: string, private readonly params: readonly string[], private readonly parentId?: string) {
+  constructor(private readonly factory: Pick<ShapeFactory, 'create'>, private readonly type: string, private readonly id: string, private readonly params: readonly string[], private readonly parentId?: string) {
     super(); this.description = `create ${type}#${id}`;
   }
   protected apply(document: SvgDocument): string {

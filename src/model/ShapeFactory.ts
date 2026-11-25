@@ -4,6 +4,11 @@ import { Shape } from './Shape.js';
 
 export class ShapeFactory {
   private readonly providers = new Map<string, ShapeProvider>();
+  get entries(): readonly ShapeProvider[] { return [...this.providers.values()]; }
+  checkpoint(): () => void {
+    const before = [...this.providers.entries()];
+    return () => { this.providers.clear(); before.forEach(([name, value]) => this.providers.set(name, value)); };
+  }
 
   register(provider: ShapeProvider): void {
     if (this.providers.has(provider.name)) throw new Error(`duplicate registration: shapes/${provider.name}`);

@@ -6,8 +6,8 @@ import type { AttributeRegistry } from './AttributeRegistry.js';
 
 export interface CommandContext {
   readonly session: EditorAccess;
-  readonly shapes: ShapeFactory;
-  readonly attributes: AttributeRegistry;
+  readonly shapes: Pick<ShapeFactory, 'create' | 'fromAttributes' | 'fromSvg' | 'help'>;
+  readonly attributes: Pick<AttributeRegistry, 'apply'>;
   registerCommand(command: Command): void;
   commands(): readonly Command[];
   tree(document: SvgDocument, id?: string): string;

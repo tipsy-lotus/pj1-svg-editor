@@ -3,6 +3,11 @@ import type { TreeContext } from './TreeContext.js';
 
 export class TreeDecoratorRegistry {
   private readonly decorators = new Map<string, TreeDecorator>();
+  get entries(): readonly TreeDecorator[] { return [...this.decorators.values()]; }
+  checkpoint(): () => void {
+    const before = [...this.decorators.entries()];
+    return () => { this.decorators.clear(); before.forEach(([name, value]) => this.decorators.set(name, value)); };
+  }
   register(decorator: TreeDecorator): void {
     if (this.decorators.has(decorator.name)) throw new Error(`duplicate registration: decorators/${decorator.name}`);
     if (!decorator.name || typeof decorator.decorate !== 'function') throw new Error('invalid tree decorator');

@@ -3,6 +3,11 @@ import type { SvgDocument } from '../model/SvgDocument.js';
 
 export class AttributeRegistry {
   private readonly handlers = new Map<string, AttributeHandler>();
+  get entries(): readonly AttributeHandler[] { return [...this.handlers.values()]; }
+  checkpoint(): () => void {
+    const before = [...this.handlers.entries()];
+    return () => { this.handlers.clear(); before.forEach(([name, value]) => this.handlers.set(name, value)); };
+  }
   register(handler: AttributeHandler): void {
     if (this.handlers.has(handler.name)) throw new Error(`duplicate registration: attributes/${handler.name}`);
     if (!handler.name || typeof handler.handles !== 'function' || typeof handler.apply !== 'function') {
