@@ -1,0 +1,27 @@
+svg-editor 0.1 — type 'help' for commands
+[DIR]  docs
+[FILE]  .hidden
+[FILE]  example.svg
+canvas 800x600 created
+rect#r created
+g#group created
+circle#c created in g#group
+rect: 1  circle: 1  (total 2, containers 1)
+saved to ../session.svg (3 elements)
+[DIR]  docs
+[FILE]  .hidden
+[FILE]  example.svg
+rect#r moved by (5,0)
+[DIR]  docs
+[FILE]  .hidden
+[FILE]  example.svg
+undone: move r
+rect: 1  circle: 1  (total 2, containers 1)
+redone: move r
+rect: 1  circle: 1  (total 2, containers 1)
+read example.svg (1 elements)
+text: 1  (total 1, containers 0)
+[DIR]  docs
+[FILE]  .hidden
+[FILE]  example.svg
+bye

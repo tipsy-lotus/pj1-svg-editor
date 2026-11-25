@@ -224,7 +224,7 @@ npm.cmd --prefix vscode-extension run test:in-process
 
 四个扩展点、宿主整包注册事务、动态配置加载、复合图形结构保护和保存点观察已接通，指标首次产出见 [docs/metrics](../docs/metrics/README.md)。`stats`、`dir` 已接入，`box`、`modified-star` 与 `(box)` 标签均待接入，完整双装配会话验收仍未完成。
 
-架构对照：[Phase 1 图源](architecture.puml) → [Phase 2 当前框架图源](architecture-phase2.puml)。本次变化是将具体图形与命令注册移到插件包，宿主承担选择和加载，内核通过公开契约调用；配置加载器和整包激活事务属于宿主。当前图仅描述已实现部分，后续补上实际可选插件。
+架构对照：[Phase 1 图源](architecture.puml) → [Phase 2 当前框架图源](architecture-phase2.puml)。本次变化是将具体图形与命令注册移到插件包，宿主承担选择和加载，内核通过公开契约调用；配置加载器和整包激活事务属于宿主。当前图包含 stats、dir，后续补上 box 与树标签。
 
 | 扩展点 | 职责与调用位置 | 实现与缺省行为 | 契约错误 |
 | --- | --- | --- | --- |
@@ -295,6 +295,20 @@ CLI 测试共 152 项通过：保留原有 95 项行为断言，新增 8 项图�
 DirPlugin 默认注入真实适配器，测试可注入 MemoryDirectoryAccess，代码与配置装配使用同一个 DirPlugin/DirCommand/DirectoryAccess。空目录输出 `(empty directory)`，读取失败报 `error: cannot read directory: <path>`，CLI 随后仍可处理其他命令。查询不调用会话编辑入口，不改变文档、保存点、当前 SVG 路径或历史；插件只在自身包中访问文件系统。
 
 独立测试：先构建，再执行 `node --test --test-isolation=none dist/test/dir-plugin.test.js`。覆盖混合项、隐藏项、稳定排序、空目录、读取失败、无文档使用、参数与 help、成功/失败均保留 redo 和历史屏障；真实临时目录验证命令与适配器组合。两种装配对同一固定目录输出逐字节一致，日志位于被列目录之外。临时文件位于忽略的 `.cache/`。本次运行代码只新增 dir 插件并修改配置，内核、加载器、stats 和内置插件均未修改。
+
+### 命令插件完整会话证据
+
+```powershell
+npm.cmd run build
+node scripts/replay-command-plugins.mjs
+node --test --test-isolation=none scripts/command-session.test.mjs
+```
+
+`doc/transcript/command-plugins.txt` 只包含命令与注释；`fixtures/command-input.svg` 是独立初始 SVG。两份实际输出保存为 `command-plugins.code.txt` 和 `command-plugins.config.txt`，生成图形另存为 `command-plugins.saved.svg`。配置输入也单独保存，不将输出混入输入。
+
+回放器在同一份固定临时工作目录内依次执行两种装配，使用同一批插件、顺序、options、真实文件适配器和 REPL。覆盖无文档 dir、混合目录及隐藏项、stats、保存、移动、撤销重做和读回。日志与保存文件位于被列目录之外；回放前后检查目录子项不变，四次 dir 内容一致，两种装配的输出与 SVG 字节均一致。新增 1 项会话测试独立于 152 项 CLI 测试运行。
+
+这份材料证明两种装配的运行行为一致，不替代题目要求的独立代码装配接入提交差异。stats 与 dir 的当前接入提交仅新增插件并修改配置，未修改内核、加载器或既有插件；后续仍须为代码装配方式保留相应历史证据，并补齐 box 会话。
 
 ### 自动指标与框架检查
 

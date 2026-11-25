@@ -1,7 +1,7 @@
 # CLI 重构指标（脚本生成）
 
 基线：final (ce4e37a49d1d3527ea680358810e37cb99f7b654)
-目标：HEAD (a8373116e6c3ffd480d0e498da20b656654e9d7d)
+目标：HEAD (df931623c9c5461a3d479e0bac4dc90f834f22a8)
 
 当前是阶段快照；收尾必须用 final 与 p2 再生成。统计来自已提交的 Git 快照，不包含工作区未提交内容。
 
@@ -9,9 +9,9 @@
 | --- | --- | --- | --- | --- |
 | kernel | 33 / 987 / 403 | 46 / 1150 / 436 | 163 | 33 |
 | assembly | 1 / 16 / 5 | 6 / 241 / 107 | 225 | 102 |
-| plugins | 0 / 0 / 0 | 4 / 144 / 61 | 144 | 61 |
+| plugins | 0 / 0 / 0 | 11 / 239 / 87 | 239 | 87 |
 | vscode | 0 / 0 / 0 | 6 / 158 / 37 | 158 | 37 |
-| CLI 合计（不含 VSCode） | 34 / 1003 / 408 | 56 / 1535 / 604 | 532 | 196 |
+| CLI 合计（不含 VSCode） | 34 / 1003 / 408 | 63 / 1630 / 630 | 627 | 222 |
 
 kernel=内核，assembly=装配处，plugins=CLI 插件；vscode 单独列出，不计入 CLI 重构增量。
 
@@ -29,6 +29,13 @@ AST 解析器固定为 typescript-analysis（TypeScript 6.0.3），与项目 Typ
 | plugins/builtin-commands/src/RegisteredCommand.ts | plugins | 插件包 builtin-commands | 13 | 2 |
 | plugins/builtin-shapes/src/BuiltinShapeProvider.ts | plugins | 插件包 builtin-shapes | 32 | 15 |
 | plugins/builtin-shapes/src/BuiltinShapesPlugin.ts | plugins | 插件包 builtin-shapes | 24 | 8 |
+| plugins/dir/src/DirCommand.ts | plugins | 插件包 dir | 20 | 11 |
+| plugins/dir/src/DirectoryAccess.ts | plugins | 插件包 dir | 6 | 0 |
+| plugins/dir/src/DirectoryEntry.ts | plugins | 插件包 dir | 4 | 0 |
+| plugins/dir/src/DirPlugin.ts | plugins | 插件包 dir | 14 | 2 |
+| plugins/dir/src/NodeDirectoryAccess.ts | plugins | 插件包 dir | 14 | 6 |
+| plugins/stats/src/StatsCommand.ts | plugins | 插件包 stats | 25 | 6 |
+| plugins/stats/src/StatsPlugin.ts | plugins | 插件包 stats | 12 | 1 |
 | src/application/EditorSession.ts | kernel | 文档会话 | 58 | 18 |
 | src/cli/CommandDispatcher.ts | kernel | 分词、分派与结构展示 | 66 | 34 |
 | src/cli/Repl.ts | kernel | 分词、分派与结构展示 | 25 | 10 |
