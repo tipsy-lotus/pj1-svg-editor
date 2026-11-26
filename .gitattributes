@@ -1,0 +1,4 @@
+# 会话证据按原始字节比较，避免 Windows 检出时将 LF 改成 CRLF。
+doc/transcript/*.txt text eol=lf
+doc/transcript/*.svg text eol=lf
+doc/transcript/fixtures/*.svg text eol=lf

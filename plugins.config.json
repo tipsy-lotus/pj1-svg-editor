@@ -1,6 +1,8 @@
 {
   "plugins": [
     { "module": "./plugins/stats" },
-    { "module": "./plugins/dir" }
+    { "module": "./plugins/dir" },
+    { "module": "./plugins/box" },
+    { "module": "./plugins/tree-star" }
   ]
 }
