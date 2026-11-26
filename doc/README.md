@@ -277,7 +277,11 @@ CLI 测试共 161 项通过：保留原有 95 项行为断言，新增 8 项图�
 
 保存带 data-kind="box"，未装插件时按普通 g 保留子树；已装插件但结构不合法则拒绝整个读入。派生 id 全局冲突时整条创建失败，不留下部分子树。必要部件不能直接删除、移走或重组，box 本身不能解组，整体删除和撤销仍可用。具体边界见 [ADR 005](adr/005-box-invariants.md)。
 
-独立测试入口：构建后运行 `node --test --test-isolation=none dist/test/box-plugin.test.js`。包括无其他插件的注册/创建、移动缩放、属性撤销重做、冲突、结构保护、嵌套、读回与降级、失败保持原文档，以及代码/配置装配的输出和 SVG 字节一致。完整 §6.1 会话与独立代码接入提交证据在后续补充，本次接入不修改内核、加载器或既有插件。
+独立测试入口：构建后运行 `node --test --test-isolation=none dist/test/box-plugin.test.js`。包括无其他插件的注册/创建、移动缩放、属性撤销重做、冲突、结构保护、嵌套、读回与降级、失败保持原文档，以及代码/配置装配的输出和 SVG 字节一致。本次配置接入不修改内核、加载器或既有插件；独立代码接入提交证据待补充。
+
+完整 §6.1 版本 B 输入位于 `doc/transcript/box.txt`，只含命令和注释。两份输出为 `box.code.txt`、`box.config.txt`，生成 SVG 为 `box.saved.svg`，配置单列在 `box.config.json`。运行 `npm.cmd run build`、`node scripts/replay-box.mjs` 和 `node --test --test-isolation=none scripts/box-session.test.mjs` 可复现。两种装配使用相同插件、顺序、options、输入与工作目录，实际 REPL 和文件适配器参与；输出及保存 SVG 字节一致，读回后检查 8 个元素、Box 类型、坐标、颜色与标题。此项会话测试独立于 161 项 CLI 测试。
+
+配置接入提交为 `7ce2bdf`，父版本为 `f544a0c`。脚本 `scripts/prepare-box-code-demo.ps1` 从父版本生成仅新增 box 导入与激活的顶层装配文件到 `.cache/box-code-demo/main.ts`，不改变当前源码或 Git 状态。后续在独立演示分支新增同一 box 包并仅替换 src/main.ts，以保留代码装配方式的实际提交差异；准备文件本身不能充当已完成的提交证据。
 
 ### stats 命令插件
 
