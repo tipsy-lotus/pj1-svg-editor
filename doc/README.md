@@ -222,7 +222,7 @@ npm.cmd --prefix vscode-extension run test:in-process
 
 ## Phase 2 进展：CLI 扩展点
 
-四个扩展点、宿主整包注册事务、动态配置加载、复合图形结构保护和保存点观察已接通，指标首次产出见 [docs/metrics](../docs/metrics/README.md)。`stats`、`dir`、`box` 及 `(box)` 标签已接入，`modified-star`、完整双装配会话和独立代码接入提交证据仍待补齐。
+四个扩展点、宿主整包注册事务、动态配置加载、复合图形结构保护和保存点观察已接通，指标首次产出见 [docs/metrics](../docs/metrics/README.md)。`stats`、`dir`、`box`、`(box)` 与 `modified-star` 均已接入；box 的独立代码装配演示提交为 d039c1c。最后仍需整体验收、刷新指标和整理报告。
 
 架构对照：[Phase 1 图源](architecture.puml) → [Phase 2 当前框架图源](architecture-phase2.puml)。本次变化是将具体图形与命令注册移到插件包，宿主承担选择和加载，内核通过公开契约调用；配置加载器和整包激活事务属于宿主。当前图包含 stats、dir，后续补上 box 与树标签。
 
@@ -321,6 +321,16 @@ node --test --test-isolation=none scripts/command-session.test.mjs
 回放器在同一份固定临时工作目录内依次执行两种装配，使用同一批插件、顺序、options、真实文件适配器和 REPL。覆盖无文档 dir、混合目录及隐藏项、stats、保存、移动、撤销重做和读回。日志与保存文件位于被列目录之外；回放前后检查目录子项不变，四次 dir 内容一致，两种装配的输出与 SVG 字节均一致。新增 1 项会话测试独立于 152 项 CLI 测试运行。
 
 这份材料证明两种装配的运行行为一致，不替代题目要求的独立代码装配接入提交差异。stats 与 dir 的当前接入提交仅新增插件并修改配置，未修改内核、加载器或既有插件；后续仍须为代码装配方式保留相应历史证据，并补齐 box 会话。
+
+### modified-star 与代码装配证据
+
+`plugins/tree-star` 独立贡献 ModifiedStar 类实例，仅依赖公开树上下文和领域抽象。采用保存内容比较：新文档根与新建节点立即标记；成功 read/save 后消失，编辑后出现，undo 回保存点消失，redo 再出现。节点属性、文本、类型、子树和结构位置参与比较，属性键排序后比较，避免键插入顺序造成误判。修改传播至祖先和根；所有临时集合和状态均保存在实例字段内，没有模块级可变状态。
+
+根配置将 tree-star 放在 box 后，因此并存时显示 `(box) *`；反向装配则反向拼接，两者互不感知。未加载 star 时保留原有树输出，未加载 box 标签时 star 仍可独立使用。实现每次按当前内容重新比较，不按文档引用缓存，因此撤销后不会沿用过期状态；代价是大型树重复渲染的比较成本较高。
+
+独立运行：构建后执行 `node --test --test-isolation=none dist/test/tree-star-plugin.test.js`。新增 7 项测试通过，CLI 合计 168 项；另有 4 项指标测试和 2 项完整会话测试。原有段落中的 161 项为 box 接入节点的记录。`.gitattributes` 固定会话文本和 SVG 的 LF，避免 Windows 检出改变字节证据；比较测试仍使用原始字节，不通过忽略换行掩盖差异。
+
+代码装配演示位于 `demo/box-code`，提交 `d039c1c`，父版本 `f544a0c`；只新增 box 包和测试，运行代码仅修改顶层 src/main.ts。配置装配提交 `7ce2bdf` 则只新增同一插件并修改配置，没有修改既有运行源码。演示分支不合并至 main，保留为验收证据；后续报告需核对远程分支与提交仍可访问。
 
 ### 自动指标与框架检查
 
