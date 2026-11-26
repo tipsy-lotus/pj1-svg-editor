@@ -222,7 +222,7 @@ npm.cmd --prefix vscode-extension run test:in-process
 
 ## Phase 2 进展：CLI 扩展点
 
-四个扩展点、宿主整包注册事务、动态配置加载、复合图形结构保护和保存点观察已接通，指标首次产出见 [docs/metrics](../docs/metrics/README.md)。`stats`、`dir` 已接入，`box`、`modified-star` 与 `(box)` 标签均待接入，完整双装配会话验收仍未完成。
+四个扩展点、宿主整包注册事务、动态配置加载、复合图形结构保护和保存点观察已接通，指标首次产出见 [docs/metrics](../docs/metrics/README.md)。`stats`、`dir`、`box` 及 `(box)` 标签已接入，`modified-star`、完整双装配会话和独立代码接入提交证据仍待补齐。
 
 架构对照：[Phase 1 图源](architecture.puml) → [Phase 2 当前框架图源](architecture-phase2.puml)。本次变化是将具体图形与命令注册移到插件包，宿主承担选择和加载，内核通过公开契约调用；配置加载器和整包激活事务属于宿主。当前图包含 stats、dir，后续补上 box 与树标签。
 
@@ -230,7 +230,7 @@ npm.cmd --prefix vscode-extension run test:in-process
 | --- | --- | --- | --- |
 | `ShapeProvider` | `ShapeFactory.create/fromSvg` 调用创建和读回；`BuiltinCommandsPlugin.help` 读取提供器文案 | `plugins/builtin-shapes` 注册六类；宿主 `DefaultShapes` 默认装配；空注册表能启动，但创建或读回未注册类型时报未知图形 | 重名拒绝；元数据/方法非法拒绝；最高读回优先级并列拒绝；返回类型或 id 错误拒绝；提供器抛错保留原文档及历史 |
 | `Command` | `CommandDispatcher.execute` 查询注册表、校验插件声明的参数数量并调用 `run`；内置 help 从上下文读取注册集合 | `plugins/builtin-commands` 提供原有 21 个命令名（含 exit 别名），由宿主 `DefaultDispatcher` 装配；空注册表能启动，未注册命令报未知命令 | 重名或非法参数规则拒绝注册；非法返回值报错；执行异常转为 error 信息，后续命令仍可运行 |
-| `AttributeHandler` | `SetCommand.apply → AttributeRegistry.apply` 定位目标、检查命中并执行处理器 | 当前以独立类替身验证，实际 box 处理器待接入；缺省空注册表使用 Phase 1 白名单 | 同名或非法注册拒绝；多个命中拒绝；判断或应用抛错时文档与历史恢复，不回退默认处理 |
+| `AttributeHandler` | `SetCommand.apply → AttributeRegistry.apply` 定位目标、检查命中并执行处理器 | BoxAttributes 处理 box 的 fill/label；缺省空注册表使用 Phase 1 白名单 | 同名或非法注册拒绝；多个命中拒绝；判断或应用抛错时文档与历史恢复，不回退默认处理 |
 | `TreeDecorator` | `ShapeFormatter.tree → TreeDecoratorRegistry.suffix` 为根行、子树首行及后代行生成后缀 | 当前以独立类替身验证，实际标签插件待接入；缺省不追加任何字符，show 不受影响 | 同名或非法注册拒绝；非字符串或含换行/制表符的标签拒绝；异常交由 CLI 输出 error，不返回半棵树 |
 
 命令插件通过公开的 `CommandContext` 和 `EditorAccess` 接口使用会话、图形注册表、结构展示和关闭能力，不访问历史栈或仓库字段。`src/extensions/Command` 描述 CLI 调用；`src/commands/Command` 保留可撤销编辑事务，查询命令无需进入历史。
@@ -239,7 +239,7 @@ npm.cmd --prefix vscode-extension run test:in-process
 
 树标签通过 `TreeContext` 接收当前文档、当前图形及上次成功 read/save 的隔离快照，SVG 根行的图形为 undefined，指定子树的首行则传入该图形。标签只能读取文档，自身状态放在实例字段内。多个标签按注册顺序以一个空格连接；undefined、空串或纯空白不追加后缀，标签首尾空白被去除。渲染失败不会输出部分树；框架不提供对任意插件副作用的沙箱隔离。
 
-后续 dirty 标签采用内容对比语义，传播到祖先，undo 回到保存点时消失；新建未保存内容立即标记。会话只在成功 read/save 时更新内部保存点，init 清除；getter 返回克隆。复合容器通过 assertCanRemove/assertCanUngroup 保护必要子部件，通过 treeLabel/creationMessage 自定义显示，无需内核按插件名称分派。取舍及验证见 [ADR 004](adr/004-saved-state.md)，实际 box 与 modified-star 插件尚未实现。
+后续 dirty 标签采用内容对比语义，传播到祖先，undo 回到保存点时消失；新建未保存内容立即标记。会话只在成功 read/save 时更新内部保存点，init 清除；getter 返回克隆。复合容器通过 assertCanRemove/assertCanUngroup 保护必要子部件，通过 treeLabel/creationMessage 自定义显示，无需内核按插件名称分派。取舍及验证见 [ADR 004](adr/004-saved-state.md)，box 已使用这些能力，modified-star 尚待实现。
 
 依赖方向为：`main/host → 内核与插件`，`builtin-shapes → ShapeProvider 与公开领域类`，内核通过接口调用提供器，不反向导入插件或宿主。创建、读回共用注册表。读回先完成子树解析，再由提供器构造完整对象；优先级与降级决策见 [ADR 001](adr/001-shape-provider.md)。
 
@@ -253,13 +253,13 @@ npm.cmd --prefix vscode-extension run test:in-process
 npm.cmd run cli -- --config plugins.config.json
 ```
 
-根目录配置按顺序加载 `./plugins/stats` 和 `./plugins/dir`，分别追加统计与目录命令；不传 --config 时仍仅装配内置能力。每项包含字符串 module、可选布尔 enabled 和任意 options；`enabled: false` 完全跳过解析与导入。配置先整体检查，语法或结构错误输出 `error: invalid plugin config`，不加载其中任何条目，继续提供默认内置能力。
+根目录配置按顺序加载 `./plugins/stats`、`./plugins/dir` 和 `./plugins/box`；不传 --config 时仍仅装配内置能力。每项包含字符串 module、可选布尔 enabled 和任意 options；`enabled: false` 完全跳过解析与导入。配置先整体检查，语法或结构错误输出 `error: invalid plugin config`，不加载其中任何条目，继续提供默认内置能力。
 
 相对路径以配置文件目录为基准，支持文件入口或带 package.json 的目录；包名通过 Node `createRequire(configFile).resolve` 解析，采用该 API 的 main/exports require 条件，然后动态 import 已解析入口。插件应声明可解析的 JavaScript 入口（TypeScript 源码先构建），入口导出实现 activate 的默认实例。目录请求读取该目录的 package.json，文件/包入口查找最近的 package.json 清单。加载器不按插件名称映射或导入具体实现。
 
 顶层模块不存在报 `error: plugin not found: <module>`，无默认导出报 `error: plugin has no default export: <module>`；入口损坏、依赖缺失、求值异常或非法默认实例报激活失败，不误报顶层模块不存在。其余清单不符、重复注册和激活异常由同一个 PluginHost 处理。诊断写入 stderr，随后仍进入 CLI；CLI 命令自身的退出码规则保留。
 
-已用临时测试插件验证代码/配置装配输出逐字节一致、配置目录路径和包名解析，以及四条失败路径、重复注册回滚、禁用、options 和配置整体预检。实际 stats、dir、box 会话与固定目录的双装配验证尚未完成，不能用此测试替代最终验收。
+已用临时测试插件验证代码/配置装配输出逐字节一致、配置目录路径和包名解析，以及四条失败路径、重复注册回滚、禁用、options 和配置整体预检。stats/dir 的固定目录完整会话证据已补齐；box 目前有独立测试会话对比，题目 §6.1 完整会话及最终验收仍待补齐。
 
 验证命令：
 
@@ -269,7 +269,15 @@ npm.cmd run test:in-process
 & ./scripts/check-phase1.ps1
 ```
 
-CLI 测试共 152 项通过：保留原有 95 项行为断言，新增 8 项图形、4 项命令、5 项属性、6 项树标签、7 项宿主事务、8 项加载器、6 项通用能力、6 项 stats 及 7 项 dir 插件测试。测试中的默认仓库、创建命令与分发器由 `test/support/Default*.ts` 显式装配，避免内核为兼容旧构造方式而重新依赖默认插件。
+CLI 测试共 161 项通过：保留原有 95 项行为断言，新增 8 项图形、4 项命令、5 项属性、6 项树标签、7 项宿主事务、8 项加载器、6 项通用能力、6 项 stats、7 项 dir 及 9 项 box 插件测试。测试中的默认仓库、创建命令与分发器由 `test/support/Default*.ts` 显式装配，避免内核为兼容旧构造方式而重新依赖默认插件。
+
+### box 复合图形插件
+
+`plugins/box` 独立提供 BoxProvider、BoxAttributes 和 BoxTypeDecorator。Box 基于公开 Group 领域类组合 Rect 与 Text，所有实现均在插件包内。通过配置加载后支持 `create box n 120 100 160 60 "开始"`、嵌套与整体操作；fill 转发给内部矩形，label 修改内部标题，每次 set 是一个撤销单元。树中使用 g 标识并追加 (box)。
+
+保存带 data-kind="box"，未装插件时按普通 g 保留子树；已装插件但结构不合法则拒绝整个读入。派生 id 全局冲突时整条创建失败，不留下部分子树。必要部件不能直接删除、移走或重组，box 本身不能解组，整体删除和撤销仍可用。具体边界见 [ADR 005](adr/005-box-invariants.md)。
+
+独立测试入口：构建后运行 `node --test --test-isolation=none dist/test/box-plugin.test.js`。包括无其他插件的注册/创建、移动缩放、属性撤销重做、冲突、结构保护、嵌套、读回与降级、失败保持原文档，以及代码/配置装配的输出和 SVG 字节一致。完整 §6.1 会话与独立代码接入提交证据在后续补充，本次接入不修改内核、加载器或既有插件。
 
 ### stats 命令插件
 
