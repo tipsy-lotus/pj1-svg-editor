@@ -10,6 +10,7 @@ import { BuiltinCommandsPlugin } from '../plugins/builtin-commands/src/BuiltinCo
 import { readFileSync } from 'node:fs';
 import type { PluginManifest } from './host/PluginManifest.js';
 import { PluginLoader } from './host/PluginLoader.js';
+import { BoxPlugin } from '../plugins/box/src/BoxPlugin.js';
 
 const shapes = new ShapeFactory();
 const session = new EditorSession(new SvgFileRepository(new NodeFileStore(), new SvgCodec(shapes)));
@@ -24,6 +25,8 @@ try {
     const manifest = JSON.parse(readFileSync(new URL(builtin.manifest, import.meta.url), 'utf8')) as PluginManifest;
     for (const error of await host.activate(builtin.plugin, manifest)) process.stderr.write(error + '\n');
   }
+  const boxManifest = JSON.parse(readFileSync(new URL('../../plugins/box/package.json', import.meta.url), 'utf8')) as PluginManifest;
+  for (const error of await host.activate(new BoxPlugin(), boxManifest)) process.stderr.write(error + '\n');
   const args = process.argv.slice(2);
   if (args.length) {
     if (args.length !== 2 || args[0] !== '--config') process.stderr.write('error: invalid plugin config\n');
