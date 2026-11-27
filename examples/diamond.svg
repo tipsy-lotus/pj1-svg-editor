@@ -1,0 +1,3 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="400" height="300" viewBox="0 0 400 300">
+  <polygon id="decision" data-kind="diamond" data-cx="200" data-cy="150" data-width="120" data-height="80" points="200 110 260 150 200 190 140 150" fill="#f5a623" stroke="black"/>
+</svg>

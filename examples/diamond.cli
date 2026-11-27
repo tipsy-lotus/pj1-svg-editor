@@ -1,0 +1,15 @@
+# 使用 --config plugins.config.json 启动后回放
+init 400 300
+create diamond decision 200 150 120 80 #f5a623
+set decision stroke black
+group flow decision
+move flow 20 0
+undo
+scale decision 1.2
+undo
+stats
+tree
+save diamond.svg
+read diamond.svg
+tree
+quit
