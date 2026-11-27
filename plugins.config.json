@@ -3,6 +3,7 @@
     { "module": "./plugins/stats" },
     { "module": "./plugins/dir" },
     { "module": "./plugins/box" },
-    { "module": "./plugins/tree-star" }
+    { "module": "./plugins/tree-star" },
+    { "module": "./plugins/diamond" }
   ]
 }

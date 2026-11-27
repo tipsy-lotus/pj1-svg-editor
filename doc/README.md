@@ -332,6 +332,14 @@ node --test --test-isolation=none scripts/command-session.test.mjs
 
 代码装配演示位于 `demo/box-code`，提交 `d039c1c`，父版本 `f544a0c`；只新增 box 包和测试，运行代码仅修改顶层 src/main.ts。配置装配提交 `7ce2bdf` 则只新增同一插件并修改配置，没有修改既有运行源码。演示分支不合并至 main，保留为验收证据；后续报告需核对远程分支与提交仍可访问。
 
+### 选做：diamond 判断框插件
+
+`plugins/diamond` 新增一种 ShapeProvider，语法为 `create diamond <id> <cx> <cy> <w> <h> [fill] [in <containerId>]`，宽高必须为正数。支持 cx/cy/width/height、fill/stroke/stroke-width 修改，以及移动、缩放、分组、删除和撤销重做。领域消息和树标题显示 diamond，保存使用标准 SVG polygon，附带 data-kind 和中心/尺寸元数据；顶点按上、右、下、左顺序生成。独立示例为 `examples/diamond.cli` 和 `examples/diamond.svg`。
+
+读回只识别带 diamond 标记、四项有限几何元数据且顶点完全一致的叶子 polygon，不支持任意 polygon。缺失/冲突数据拒绝整个读取并保留原文档和历史。元数据保存精确几何值，避免从顶点反推尺寸时累积浮点误差。未安装插件时 polygon 报未知图形，不静默丢弃或承诺普通多边形降级。原有 stats 按 SVG 类型统计，因此显示 `polygon: 1`；选做不改动该插件。
+
+本次只新增插件、配置、测试、示例和文档；内核、加载器及既有插件差异为空。新增 8 项 diamond 测试后 CLI 合计 176 项，代码与配置装配的同一会话输出及 SVG 字节一致。测试入口为构建后 `node --test --test-isolation=none dist/test/diamond-plugin.test.js`。选做属于新增图形，不新增第五个扩展点；最终验收与指标仍需刷新。
+
 ### 自动指标与框架检查
 
 ```powershell
