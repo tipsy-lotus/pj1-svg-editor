@@ -163,13 +163,127 @@ CLI 的 `Tokenizer` 保留参数是否加引号，`CommandDispatcher` 集中分�
 - **回归验证**：保留空组参数、子树 ID 冲突、命令重复执行及溢出回滚用例，防止问题再次出现。
 - **结构检查**：已检查全部 34 个生产源码文件的导入关系，补全应用层对 IO 仓库的依赖说明；源代码、测试、示例和 `doc/README.md` 均已纳入版本管理。
 
-## Phase 2 进展：VSCode 扩展
+---
 
-扩展源码位于 `vscode-extension/`，独立构建，文件标记、大纲定位、编辑更新与异常恢复已在开发窗口验证。CLI 重构进展见下节；前文架构和 95 项测试记录保留为 Phase 1 对照。
+## Phase 2：插件实践与插件式重构
 
-### 启动与验证
+本阶段在 Phase 1 的同一仓库继续开发，完成 VSCode SVG 扩展、CLI 插件框架、必做插件，并选做 diamond 判断框。Phase 1 的代码和报告保存在已有 `final` 标签中；本阶段最终标签使用 `p2`，已有标签不移动。目前源码已合并，文档、指标和标签正在收尾。
 
-使用 Node.js 24.14.0，在项目根目录运行：
+### 运行与目录
+
+验证环境：Windows、Node.js 24.14.0、npm 11.9.0。TypeScript 7 用于项目编译；固定版本的 TypeScript 6 分析工具仅生成指标。
+
+```powershell
+npm.cmd ci
+npm.cmd run check
+npm.cmd run test:in-process
+npm.cmd run cli -- --config plugins.config.json
+```
+
+不传 `--config` 时只装配 Phase 1 内置命令与六类图形；根配置依次启用 stats、dir、box、tree-star、diamond。每个可选插件可通过 `enabled: false` 单独禁用。CLI 用双引号包围带空格参数，只有整行开头的 # 是注释；quit、exit 或 EOF 退出。无参数 save 使用成功 read 的路径，显式另存不改变该路径。
+
+| 目录 | 职责 |
+| --- | --- |
+| src/model | 封装图形、容器、文档树及图形注册 |
+| src/commands | 编辑事务、快照与撤销重做历史 |
+| src/application、src/io | 当前会话、保存点、SVG 编解码与文件端口 |
+| src/cli、src/extensions | 分词与渲染；公开扩展接口、上下文和注册表 |
+| src/host、src/main.ts | 代码装配、配置模块解析、插件激活事务 |
+| plugins | 内置图形/命令及各独立可选插件 |
+| vscode-extension | 独立构建的 SVG 文件标记与大纲扩展 |
+| test、scripts、doc/transcript | 单元测试、历史指标与回放工具、会话证据 |
+
+### 架构变化与设计决策
+
+| 变化点 | Phase 1 | Phase 2 |
+| --- | --- | --- |
+| 图形创建 | ShapeFactory 集中枚举六种图形 | 提供器声明名称、参数文案、创建与读回 |
+| 命令分派 | CommandDispatcher 内集中定义 | 内置与新增命令均通过类实例注册 |
+| 属性语义 | Shape.set 白名单 | 先查询处理器，无命中才使用原白名单 |
+| 树输出 | 渲染器固定输出 | 通过独立标签组合行尾内容 |
+| 装配 | main 直接连接具体实现 | 宿主暂存、校验并发布插件，支持动态配置 |
+
+[Phase 1 PlantUML 图源](architecture.puml) · [Phase 2 PlantUML 图源](architecture-phase2.puml)
+
+![Phase 1 架构](images/architecture.svg)
+
+![Phase 2 架构](images/architecture-phase2.svg)
+
+内核可依赖公开领域抽象和扩展契约，不导入宿主或插件。插件只使用公开领域操作与扩展上下文，不依赖宿主；具体插件选择集中在组合根，PluginLoader 没有具体插件名映射。静态类型依赖也计入架构检查。真实 CLI 使用 PluginHost；DefaultShapes、DefaultDispatcher 保留为默认装配及测试便利类。
+
+Composite 统一叶子和容器；Command 封装编辑；Memento 快照恢复属性、结构和顺序。CLI 命令接口 `src/extensions/Command.ts` 与可撤销事务接口 `src/commands/Command.ts` 分开，查询无需进入历史。图形提供器体现注册式工厂；TreeDecorator 组合标签；目录访问使用 Adapter。快照和标签内容比较以正确性优先，大文档的内存及重复比较成本是当前限制。
+
+| ADR | 决策 |
+| --- | --- |
+| [001](adr/001-shape-provider.md) | 子树先解析，提供器再构造；最高读回优先级并列拒绝 |
+| [002](adr/002-attribute-handler.md) | 属性多命中拒绝；一次 set 一个 undo 单元，部分失败整体恢复 |
+| [003](adr/003-plugin-registration.md) | 激活后校验四类名称集合，整包发布或回滚 |
+| [004](adr/004-saved-state.md) | dirty 按保存内容比较，向祖先传播；复合容器可保护部件 |
+| [005](adr/005-box-invariants.md) | box 固定部件 id；无插件降级，结构错误拒绝读入 |
+
+### 四个扩展点清单
+
+接口位于 `src/extensions/`，实现使用类或类实例。
+
+| 接口 | 职责与内核调用位置 | 实现 | 禁用时行为 | 契约错误 |
+| --- | --- | --- | --- | --- |
+| ShapeProvider | ShapeFactory.create/fromSvg 创建与读回；help 读取提供器文案 | BuiltinShapeProvider、BoxProvider、DiamondProvider | 默认仍有六类内置图形；未注册类型报未知图形；box SVG 可降级 g | 重名、非法提供器、返回类型/id 错误及最高匹配优先级并列拒绝 |
+| Command | CommandDispatcher.execute 查表、校验参数并 run | RegisteredCommand、StatsCommand、DirCommand | 未加载命令不出现在 help，执行报 unknown command | 重名、非法参数规则、非法返回值拒绝；异常转换为 error |
+| AttributeHandler | SetCommand.apply → AttributeRegistry.apply | BoxAttributes 的 fill/label | 原有 Shape.set 白名单继续工作，未定义属性报错 | 多命中拒绝；handles/apply 抛错整体回滚，不再尝试默认处理 |
+| TreeDecorator | ShapeFormatter.tree → TreeDecoratorRegistry.suffix | BoxTypeDecorator、ModifiedStar | 不追加字符，Phase 1 tree 基线不变；show 不追加标签 | 重名、非法实例、非字符串或含换行/制表符的标签拒绝 |
+
+### 插件装配与加载
+
+代码装配在组合根实例化插件，经 `PluginHost.activate(plugin, manifest, options)` 注册；配置装配由 PluginLoader 动态导入默认实例后调用同一个方法，不绕过清单校验或回滚。
+
+```json
+{
+  "plugins": [
+    { "module": "./plugins/box" },
+    { "module": "./plugins/tree-star" },
+    { "module": "./plugins/diamond", "enabled": false, "options": {} }
+  ]
+}
+```
+
+相对路径基于配置文件目录；包名使用 Node createRequire.resolve 的 main/exports require 条件解析，再动态 import。目录入口读取本目录 package.json，文件/包入口查找最近的 package.json。插件源码需先构建，包 main 指向可加载的 JavaScript；默认导出须提供 activate。options 原样传入，语义由插件验证。
+
+四类 contributes 名称列表缺省为空，处理器也有稳定名称。加载按配置数组顺序进行，禁用项不解析。注册先进入影子表，激活完成后比较声明与实际类别及名称集合；全部通过才发布。任何重复注册、清单不符或激活失败均撤销当前整包贡献，保留先前成功插件，并继续后续加载。并发请求串行处理，激活结束后注册入口关闭。事务只覆盖注册表，不是任意第三方副作用的安全沙箱。
+
+| 情况 | 诊断格式，之后仍可进入 CLI |
+| --- | --- |
+| 模块不存在 | `error: plugin not found: <module>` |
+| 没有默认导出 | `error: plugin has no default export: <module>` |
+| 清单与实际不符 | `error: plugin manifest mismatch: <name> (declared: …, registered: …)` |
+| 激活/求值/依赖失败 | `error: plugin failed to activate: <name> (<reason>)` |
+| 同类名称重复 | `error: duplicate registration: <category>/<name>` |
+| 配置语法或结构非法 | `error: invalid plugin config`，跳过全部配置项，保留默认能力 |
+
+模块成功解析后的依赖缺失或求值错误不误报顶层模块不存在。加载诊断写入 stderr；普通命令错误继续处理后续输入，最终退出码仍按原有规则设置。
+
+### 插件行为与边界
+
+| 插件 | 主要行为与取舍 |
+| --- | --- |
+| stats | 从画布子节点深度优先遍历，叶子按 SVG tag 首次出现顺序计数；g/box 只计容器，根不计，内部叶子照常计数；不改变文档和历史 |
+| dir | 零参数，无文档也可用；列进程当前目录的直接子项，包含隐藏项、不列点目录；目录在前、文件在后，各组按 UTF-16 名称升序 |
+| box | create box id x y w h "标题"；必要部件为 id-rect、id-label；默认蓝框白字，标题位于 x+20、y+h/2+5；支持嵌套与整体操作 |
+| box 属性与保护 | fill 修改内部矩形，label 修改内部文字，各为一个 undo 单元；直接删除/移走/重组必要部件及解组拒绝；整体删除可撤销，clone 保留 Box 类型 |
+| box 读回 | 保存为 data-kind="box" 的 g；无插件降级普通组，保留属性与子树；有插件但必要部件缺失、类型错误或重复 id 则拒绝整个 read，原文档保持 |
+| 两个树标签 | box 行追加 (box)；modified-star 比较当前内容和上次成功 read/save，包含结构位置与子树；新文档/节点立即标记，祖先传播，undo 回保存点消失 |
+| 标签状态 | 集合与状态封装在实例字段，无模块级可变状态；根配置 box 先于 star，因此显示 (box) *；插件互不感知，按注册顺序拼接 |
+| 选做 diamond | create diamond id cx cy w h [fill]，宽高为正；支持几何/样式修改、变换与历史；保存为 polygon，元数据与顶点必须一致，未装插件不静默降级；stats 显示 polygon |
+
+`dir` 不改变文档、dirty、读入路径、cwd、历史或保存屏障。空目录输出 `(empty directory)`；失败输出 `error: cannot read directory: <path>`。符号链接不跟随目标，显示 [LINK]，其他特殊项显示 [OTHER]，排在文件后。
+
+| Adapter 角色 | 代码 | 职责 |
+| --- | --- | --- |
+| Client | DirCommand | 调用目录接口并排序、格式化 |
+| Target | DirectoryAccess | currentDirectory/list，不暴露 Node Dirent |
+| Adapter | NodeDirectoryAccess | 将 Node 目录项转换为 DirectoryEntry |
+| Adaptee | fs.readdirSync、process.cwd | 实际文件系统访问与目录查询 |
+
+### VSCode 扩展与运行证据
 
 ```powershell
 npm.cmd --prefix vscode-extension ci
@@ -177,179 +291,72 @@ npm.cmd --prefix vscode-extension run check
 npm.cmd --prefix vscode-extension run test:in-process
 ```
 
-用 VSCode 打开项目根目录，按 F5 选择“调试 SVG 扩展”。在新窗口以文本方式打开 `outline.svg`，展开原生“大纲”。重建后需关闭旧调试窗口再按 F5，或在开发窗口执行 `Developer: Reload Window`。
+用 VSCode 打开仓库根目录，按 F5 选择“调试 SVG 扩展”。开发窗口以文本方式打开 outline.svg，在 Explorer 下方展开“大纲”。重建后重新启动调试或 Reload Window。
 
-| 验证项 | 操作与预期 |
-| --- | --- |
-| 文件标记 | `outline.svg` 旁显示 `[]`；`note.txt`、`folder.svg` 目录不标记；文件名和内容保持不变 |
-| 层级与定位 | 展开 `svg → g#flowchart`，可见 `rect#start`、无 id 的 `text` 和嵌套 `g#next`；点击 `rect#start` 定位到第 3 行 |
-| 未保存编辑 | 将 `start` 改为 `begin`，不保存也应更新为 `rect#begin` |
-| 不完整 XML | 删除末尾 `</svg>`，大纲暂时清空；恢复后重新出现，扩展不崩溃 |
+VSCode 负责界面、编辑更新调度与定位；extension.ts 注册 FileDecorationProvider 与 DocumentSymbolProvider，并通过 subscriptions 释放资源。文件提供器只返回 [] 标记，不改文件名或内容；大纲提供器把独立解析树及字符偏移适配为 DocumentSymbol/Range。
 
-我在扩展开发窗口完成了上表验证，并保存以下运行截图。大纲中若同时出现“XML”和“PJ1 SVG Tools”，本项目提供的是后者；文件旁的 `U` 是 Git 状态，`[]` 才是 SVG 标记。
+文件装饰与经典 Decorator 都追加展示信息，但没有完整的“同接口包装原对象并转发”结构，不能仅凭名称认定为经典装饰器。大纲提供器体现 Adapter：客户端是 VSCode，被适配数据是 OutlineElement，输出是宿主符号接口。Phase 1 的解析依赖 sax 可复用，但 SvgCodec 会分配 id、限制图形且不保留源码位置，领域树不能直接用于大纲定位，因此扩展独立解析 XML，不依赖 CLI 内部实现。
 
-![SVG 文件标记：普通文件与同名目录不加标记](images/vscode-svg-badge.png)
+我已在开发窗口观察原始大纲、验证嵌套与无 id 元素、点击定位、未保存更新和不完整 XML 恢复。下面均为实际运行截图，题目附带的 JPG 不作为证据；若同时出现 XML 与 PJ1 SVG Tools 两组大纲，本项目对应后者，U 是 Git 状态而非 SVG 标记。
 
-![大纲层级与 rect#start 的第 3 行源码定位](images/vscode-svg-outline.png)
+![SVG 标记，普通文本与同名目录不标记](images/vscode-svg-badge.png)
 
-[未保存编辑更新为 rect#begin](images/vscode-svg-begin.png)
+![嵌套大纲及第 3 行源码定位](images/vscode-svg-outline.png)
 
-[删除闭合标签后本扩展大纲清空](images/vscode-svg-incomplete.png) 
+[未保存编辑更新](images/vscode-svg-begin.png) · [缺闭合标签时本扩展大纲清空](images/vscode-svg-incomplete.png) · [恢复闭合标签后节点出现](images/vscode-svg-recovered.png)
 
-[恢复闭合标签后节点重新出现](images/vscode-svg-recovered.png)
-
-异常截图中保留的无 id 树由其他 XML 扩展提供，不是本扩展的残留节点。验证结束后，我已将示例恢复为 `id="start"` 和完整 XML。题目目录中的 JPG 仅是参考，本节使用的 PNG 是实际运行截图。
-
-### 职责与模式分析
-
-`extension.ts` 是装配入口，向 VSCode 注册 `SvgFileDecorationProvider` 和 `SvgDocumentSymbolProvider`，并将资源放入 `context.subscriptions`。VSCode 管理 Explorer、大纲界面、编辑后的重新查询和节点定位；扩展只返回标记或带源码范围的元素树，不自行绘制界面，也不改写 SVG 文件。
-
-文件装饰与经典 Decorator 都体现了追加展示信息，但这里由 VSCode 调用提供器并合成效果，没有包装原文件对象并转发同一接口的完整结构，因此不能仅凭名称就认定为经典 Decorator。`SvgDocumentSymbolProvider` 则承担适配器职责：将独立解析器生成的 `OutlineElement` 转为宿主要求的 `DocumentSymbol`，把字符偏移转为 `Range`；VSCode 是客户端，解析结果是被适配的数据。
-
-### Phase 1 复用评估
-
-我保留了 Phase 1 的 CLI 代码。其 XML 解析依赖所用的 `sax` 可以复用，但 `SvgCodec` 会分配缺失 id、限制可读类型，且结果不保留源码范围；领域模型和遍历逻辑也依赖这些转换后的对象，不能直接满足大纲的源码定位和任意 XML 元素展示。因此扩展直接依赖 `sax`，通过独立解析器保留层级及源码偏移，不导入 CLI 内部模块。解析不完整输入时返回空树，下一次查询重新解析当前编辑内容。
-
-### 检查与协作记录
-
-| 节点 | AI 辅助内容 | 我的检查与当前结果 |
-| --- | --- | --- |
-| 原生大纲观察 | 提供视图位置与观察方法 | 我打开 SVG 后看到“活动编辑器无法提供大纲信息”，确认实现前没有可用大纲 |
-| API 与实现 | 协助查询注册接口，提供文件装饰、源码范围适配与测试代码草稿 | 我在开发窗口核对文件标记、嵌套层级、无 id 元素及第 3 行定位，并保存截图 |
-| 自动化检查 | 补充同名目录、未保存编辑、中文与 emoji 偏移、异常输入等边界用例 | 扩展类型检查及 9 项自动化测试通过；测试使用宿主 API 替身，不能代替真实界面验证 |
-| 大纲排查 | 根据实际反馈补充当前文本文件、匹配状态和解析结果的诊断；启动时自动打开示例，并在示例工作区指定 SVG 使用文本编辑器 | 调整后，我确认大纲能够显示和定位；原先未显示的具体原因未完全确认 |
-| 异常与恢复 | 建议将编辑更新、不完整 XML 和恢复分开留证 | 我验证未保存编辑也会更新；删除 `</svg>` 后本扩展大纲清空，恢复后节点重新出现，随后恢复并保存原示例 |
-
-## Phase 2 进展：CLI 扩展点
-
-四个扩展点、宿主整包注册事务、动态配置加载、复合图形结构保护和保存点观察已接通，指标首次产出见 [docs/metrics](../docs/metrics/README.md)。`stats`、`dir`、`box`、`(box)` 与 `modified-star` 均已接入；box 的独立代码装配演示提交为 d039c1c。最后仍需整体验收、刷新指标和整理报告。
-
-架构对照：[Phase 1 图源](architecture.puml) → [Phase 2 当前框架图源](architecture-phase2.puml)。本次变化是将具体图形与命令注册移到插件包，宿主承担选择和加载，内核通过公开契约调用；配置加载器和整包激活事务属于宿主。当前图包含 stats、dir，后续补上 box 与树标签。
-
-| 扩展点 | 职责与调用位置 | 实现与缺省行为 | 契约错误 |
-| --- | --- | --- | --- |
-| `ShapeProvider` | `ShapeFactory.create/fromSvg` 调用创建和读回；`BuiltinCommandsPlugin.help` 读取提供器文案 | `plugins/builtin-shapes` 注册六类；宿主 `DefaultShapes` 默认装配；空注册表能启动，但创建或读回未注册类型时报未知图形 | 重名拒绝；元数据/方法非法拒绝；最高读回优先级并列拒绝；返回类型或 id 错误拒绝；提供器抛错保留原文档及历史 |
-| `Command` | `CommandDispatcher.execute` 查询注册表、校验插件声明的参数数量并调用 `run`；内置 help 从上下文读取注册集合 | `plugins/builtin-commands` 提供原有 21 个命令名（含 exit 别名），由宿主 `DefaultDispatcher` 装配；空注册表能启动，未注册命令报未知命令 | 重名或非法参数规则拒绝注册；非法返回值报错；执行异常转为 error 信息，后续命令仍可运行 |
-| `AttributeHandler` | `SetCommand.apply → AttributeRegistry.apply` 定位目标、检查命中并执行处理器 | BoxAttributes 处理 box 的 fill/label；缺省空注册表使用 Phase 1 白名单 | 同名或非法注册拒绝；多个命中拒绝；判断或应用抛错时文档与历史恢复，不回退默认处理 |
-| `TreeDecorator` | `ShapeFormatter.tree → TreeDecoratorRegistry.suffix` 为根行、子树首行及后代行生成后缀 | 当前以独立类替身验证，实际标签插件待接入；缺省不追加任何字符，show 不受影响 | 同名或非法注册拒绝；非字符串或含换行/制表符的标签拒绝；异常交由 CLI 输出 error，不返回半棵树 |
-
-命令插件通过公开的 `CommandContext` 和 `EditorAccess` 接口使用会话、图形注册表、结构展示和关闭能力，不访问历史栈或仓库字段。`src/extensions/Command` 描述 CLI 调用；`src/commands/Command` 保留可撤销编辑事务，查询命令无需进入历史。
-
-属性处理器通过 `AttributeContext` 使用公开领域方法，整条调用包在一个 `SetCommand` 快照事务中；即使改动多个子部件，也能一次撤销或重做。冲突统一拒绝，部分失败整体恢复；具体约定见 [ADR 002](adr/002-attribute-handler.md)。
-
-树标签通过 `TreeContext` 接收当前文档、当前图形及上次成功 read/save 的隔离快照，SVG 根行的图形为 undefined，指定子树的首行则传入该图形。标签只能读取文档，自身状态放在实例字段内。多个标签按注册顺序以一个空格连接；undefined、空串或纯空白不追加后缀，标签首尾空白被去除。渲染失败不会输出部分树；框架不提供对任意插件副作用的沙箱隔离。
-
-后续 dirty 标签采用内容对比语义，传播到祖先，undo 回到保存点时消失；新建未保存内容立即标记。会话只在成功 read/save 时更新内部保存点，init 清除；getter 返回克隆。复合容器通过 assertCanRemove/assertCanUngroup 保护必要子部件，通过 treeLabel/creationMessage 自定义显示，无需内核按插件名称分派。取舍及验证见 [ADR 004](adr/004-saved-state.md)，box 已使用这些能力，modified-star 尚待实现。
-
-依赖方向为：`main/host → 内核与插件`，`builtin-shapes → ShapeProvider 与公开领域类`，内核通过接口调用提供器，不反向导入插件或宿主。创建、读回共用注册表。读回先完成子树解析，再由提供器构造完整对象；优先级与降级决策见 [ADR 001](adr/001-shape-provider.md)。
-
-真实 CLI 入口通过 `PluginHost.activate` 进行代码装配，内置插件读取各自 package.json 清单。四类贡献先暂存，激活完成后按类别和名称集合校验，通过后一起发布；重名、清单不符或激活失败均丢弃当前插件贡献，保留已有成功插件。异步激活与并发请求按顺序处理，options 原样传入，激活结束后禁止追加注册。详细边界见 [ADR 003](adr/003-plugin-registration.md)。
-
-### 配置装配
-
-默认启动使用代码装配的内置能力；显式指定配置后，按数组顺序追加可选插件：
-
-```powershell
-npm.cmd run cli -- --config plugins.config.json
-```
-
-根目录配置按顺序加载 `./plugins/stats`、`./plugins/dir` 和 `./plugins/box`；不传 --config 时仍仅装配内置能力。每项包含字符串 module、可选布尔 enabled 和任意 options；`enabled: false` 完全跳过解析与导入。配置先整体检查，语法或结构错误输出 `error: invalid plugin config`，不加载其中任何条目，继续提供默认内置能力。
-
-相对路径以配置文件目录为基准，支持文件入口或带 package.json 的目录；包名通过 Node `createRequire(configFile).resolve` 解析，采用该 API 的 main/exports require 条件，然后动态 import 已解析入口。插件应声明可解析的 JavaScript 入口（TypeScript 源码先构建），入口导出实现 activate 的默认实例。目录请求读取该目录的 package.json，文件/包入口查找最近的 package.json 清单。加载器不按插件名称映射或导入具体实现。
-
-顶层模块不存在报 `error: plugin not found: <module>`，无默认导出报 `error: plugin has no default export: <module>`；入口损坏、依赖缺失、求值异常或非法默认实例报激活失败，不误报顶层模块不存在。其余清单不符、重复注册和激活异常由同一个 PluginHost 处理。诊断写入 stderr，随后仍进入 CLI；CLI 命令自身的退出码规则保留。
-
-已用临时测试插件验证代码/配置装配输出逐字节一致、配置目录路径和包名解析，以及四条失败路径、重复注册回滚、禁用、options 和配置整体预检。stats/dir 的固定目录完整会话证据已补齐；box 目前有独立测试会话对比，题目 §6.1 完整会话及最终验收仍待补齐。
-
-验证命令：
+### 测试、兼容性与提交证据
 
 ```powershell
 npm.cmd run check
 npm.cmd run test:in-process
+node --test --test-isolation=none scripts/metrics.test.mjs scripts/box-session.test.mjs scripts/command-session.test.mjs
 & ./scripts/check-phase1.ps1
-```
-
-CLI 测试共 161 项通过：保留原有 95 项行为断言，新增 8 项图形、4 项命令、5 项属性、6 项树标签、7 项宿主事务、8 项加载器、6 项通用能力、6 项 stats、7 项 dir 及 9 项 box 插件测试。测试中的默认仓库、创建命令与分发器由 `test/support/Default*.ts` 显式装配，避免内核为兼容旧构造方式而重新依赖默认插件。
-
-### box 复合图形插件
-
-`plugins/box` 独立提供 BoxProvider、BoxAttributes 和 BoxTypeDecorator。Box 基于公开 Group 领域类组合 Rect 与 Text，所有实现均在插件包内。通过配置加载后支持 `create box n 120 100 160 60 "开始"`、嵌套与整体操作；fill 转发给内部矩形，label 修改内部标题，每次 set 是一个撤销单元。树中使用 g 标识并追加 (box)。
-
-保存带 data-kind="box"，未装插件时按普通 g 保留子树；已装插件但结构不合法则拒绝整个读入。派生 id 全局冲突时整条创建失败，不留下部分子树。必要部件不能直接删除、移走或重组，box 本身不能解组，整体删除和撤销仍可用。具体边界见 [ADR 005](adr/005-box-invariants.md)。
-
-独立测试入口：构建后运行 `node --test --test-isolation=none dist/test/box-plugin.test.js`。包括无其他插件的注册/创建、移动缩放、属性撤销重做、冲突、结构保护、嵌套、读回与降级、失败保持原文档，以及代码/配置装配的输出和 SVG 字节一致。本次配置接入不修改内核、加载器或既有插件；独立代码接入提交证据待补充。
-
-完整 §6.1 版本 B 输入位于 `doc/transcript/box.txt`，只含命令和注释。两份输出为 `box.code.txt`、`box.config.txt`，生成 SVG 为 `box.saved.svg`，配置单列在 `box.config.json`。运行 `npm.cmd run build`、`node scripts/replay-box.mjs` 和 `node --test --test-isolation=none scripts/box-session.test.mjs` 可复现。两种装配使用相同插件、顺序、options、输入与工作目录，实际 REPL 和文件适配器参与；输出及保存 SVG 字节一致，读回后检查 8 个元素、Box 类型、坐标、颜色与标题。此项会话测试独立于 161 项 CLI 测试。
-
-配置接入提交为 `7ce2bdf`，父版本为 `f544a0c`。脚本 `scripts/prepare-box-code-demo.ps1` 从父版本生成仅新增 box 导入与激活的顶层装配文件到 `.cache/box-code-demo/main.ts`，不改变当前源码或 Git 状态。后续在独立演示分支新增同一 box 包并仅替换 src/main.ts，以保留代码装配方式的实际提交差异；准备文件本身不能充当已完成的提交证据。
-
-### stats 命令插件
-
-`plugins/stats` 是独立插件包，贡献类实例 StatsCommand，命令名、零参数规则与 help 文案均在插件侧声明。StatsPlugin 只依赖公开接口与领域抽象，统计从画布子节点按顺序深度优先遍历：叶子按 tag 计数，类型按首次出现顺序输出；所有容器只计 containers，根 SVG 不计，复合容器内部叶子照常计数。
-
-使用 `npm.cmd run cli -- --config plugins.config.json` 后可执行 stats；禁用该条目或不传配置时，命令不出现在 help 中，执行报未知命令。空文档输出 `(total 0, containers 0)`，未初始化时报原有的无文档错误。统计使用公开文档查询，不提交编辑事务、不改变保存点或历史。
-
-独立测试入口：先运行 `npm.cmd run build`，再运行 `node --test --test-isolation=none dist/test/stats-plugin.test.js`。测试包含嵌套遍历、类型顺序、容器和空文档、禁用与 help、历史屏障与 redo，以及同一实现的代码/配置装配输出对比。本次仅新增插件、测试和文档，并修改配置，没有修改内核、加载器或既有插件，作为配置接入方式的增量记录。完整会话证据和代码接入方式的独立提交差异仍需后续补充。
-
-回放脚本从 `final` 取出源码进行构建，在 `.cache/shape-compatibility/` 的两份独立工作目录运行真实 CLI 入口。相同输入包含 help、基础会话和流程图会话，输出逐字节一致；生成的 `demo.svg` 与 `flowchart.svg` 也逐字节一致。原有命令脚本只有命令和注释，不含提示符或示例输出。日志与临时产物不提交。
-
-### dir 插件与目录适配器
-
-`plugins/dir` 独立贡献 DirCommand，零参数、不要求 SVG 文档。命令查询执行时的进程工作目录，read/save 不改变该目录；只列直接子项，包含隐藏项，不列点目录，也不递归。目录在前、普通文件在后，各组按 UTF-16 字符串顺序升序排列，避免 locale 引入不同输出。符号链接不跟随目标，单列为 `[LINK]`，其余特殊项为 `[OTHER]`，排在普通文件之后。
-
-| 适配器角色 | 接口或类 | 职责 |
-| --- | --- | --- |
-| Client | DirCommand | 调用目录接口，排序并生成固定格式输出 |
-| Target | DirectoryAccess | 提供 currentDirectory/list，不暴露 Node Dirent |
-| Adapter | NodeDirectoryAccess | 将 Node 目录项转换为 DirectoryEntry |
-| Adaptee | Node fs.readdirSync 与 process.cwd | 实际目录读取及工作目录查询 |
-
-DirPlugin 默认注入真实适配器，测试可注入 MemoryDirectoryAccess，代码与配置装配使用同一个 DirPlugin/DirCommand/DirectoryAccess。空目录输出 `(empty directory)`，读取失败报 `error: cannot read directory: <path>`，CLI 随后仍可处理其他命令。查询不调用会话编辑入口，不改变文档、保存点、当前 SVG 路径或历史；插件只在自身包中访问文件系统。
-
-独立测试：先构建，再执行 `node --test --test-isolation=none dist/test/dir-plugin.test.js`。覆盖混合项、隐藏项、稳定排序、空目录、读取失败、无文档使用、参数与 help、成功/失败均保留 redo 和历史屏障；真实临时目录验证命令与适配器组合。两种装配对同一固定目录输出逐字节一致，日志位于被列目录之外。临时文件位于忽略的 `.cache/`。本次运行代码只新增 dir 插件并修改配置，内核、加载器、stats 和内置插件均未修改。
-
-### 命令插件完整会话证据
-
-```powershell
-npm.cmd run build
-node scripts/replay-command-plugins.mjs
-node --test --test-isolation=none scripts/command-session.test.mjs
-```
-
-`doc/transcript/command-plugins.txt` 只包含命令与注释；`fixtures/command-input.svg` 是独立初始 SVG。两份实际输出保存为 `command-plugins.code.txt` 和 `command-plugins.config.txt`，生成图形另存为 `command-plugins.saved.svg`。配置输入也单独保存，不将输出混入输入。
-
-回放器在同一份固定临时工作目录内依次执行两种装配，使用同一批插件、顺序、options、真实文件适配器和 REPL。覆盖无文档 dir、混合目录及隐藏项、stats、保存、移动、撤销重做和读回。日志与保存文件位于被列目录之外；回放前后检查目录子项不变，四次 dir 内容一致，两种装配的输出与 SVG 字节均一致。新增 1 项会话测试独立于 152 项 CLI 测试运行。
-
-这份材料证明两种装配的运行行为一致，不替代题目要求的独立代码装配接入提交差异。stats 与 dir 的当前接入提交仅新增插件并修改配置，未修改内核、加载器或既有插件；后续仍须为代码装配方式保留相应历史证据，并补齐 box 会话。
-
-### modified-star 与代码装配证据
-
-`plugins/tree-star` 独立贡献 ModifiedStar 类实例，仅依赖公开树上下文和领域抽象。采用保存内容比较：新文档根与新建节点立即标记；成功 read/save 后消失，编辑后出现，undo 回保存点消失，redo 再出现。节点属性、文本、类型、子树和结构位置参与比较，属性键排序后比较，避免键插入顺序造成误判。修改传播至祖先和根；所有临时集合和状态均保存在实例字段内，没有模块级可变状态。
-
-根配置将 tree-star 放在 box 后，因此并存时显示 `(box) *`；反向装配则反向拼接，两者互不感知。未加载 star 时保留原有树输出，未加载 box 标签时 star 仍可独立使用。实现每次按当前内容重新比较，不按文档引用缓存，因此撤销后不会沿用过期状态；代价是大型树重复渲染的比较成本较高。
-
-独立运行：构建后执行 `node --test --test-isolation=none dist/test/tree-star-plugin.test.js`。新增 7 项测试通过，CLI 合计 168 项；另有 4 项指标测试和 2 项完整会话测试。原有段落中的 161 项为 box 接入节点的记录。`.gitattributes` 固定会话文本和 SVG 的 LF，避免 Windows 检出改变字节证据；比较测试仍使用原始字节，不通过忽略换行掩盖差异。
-
-代码装配演示位于 `demo/box-code`，提交 `d039c1c`，父版本 `f544a0c`；只新增 box 包和测试，运行代码仅修改顶层 src/main.ts。配置装配提交 `7ce2bdf` 则只新增同一插件并修改配置，没有修改既有运行源码。演示分支不合并至 main，保留为验收证据；后续报告需核对远程分支与提交仍可访问。
-
-### 选做：diamond 判断框插件
-
-`plugins/diamond` 新增一种 ShapeProvider，语法为 `create diamond <id> <cx> <cy> <w> <h> [fill] [in <containerId>]`，宽高必须为正数。支持 cx/cy/width/height、fill/stroke/stroke-width 修改，以及移动、缩放、分组、删除和撤销重做。领域消息和树标题显示 diamond，保存使用标准 SVG polygon，附带 data-kind 和中心/尺寸元数据；顶点按上、右、下、左顺序生成。独立示例为 `examples/diamond.cli` 和 `examples/diamond.svg`。
-
-读回只识别带 diamond 标记、四项有限几何元数据且顶点完全一致的叶子 polygon，不支持任意 polygon。缺失/冲突数据拒绝整个读取并保留原文档和历史。元数据保存精确几何值，避免从顶点反推尺寸时累积浮点误差。未安装插件时 polygon 报未知图形，不静默丢弃或承诺普通多边形降级。原有 stats 按 SVG 类型统计，因此显示 `polygon: 1`；选做不改动该插件。
-
-本次只新增插件、配置、测试、示例和文档；内核、加载器及既有插件差异为空。新增 8 项 diamond 测试后 CLI 合计 176 项，代码与配置装配的同一会话输出及 SVG 字节一致。测试入口为构建后 `node --test --test-isolation=none dist/test/diamond-plugin.test.js`。选做属于新增图形，不新增第五个扩展点；最终验收与指标仍需刷新。
-
-### 自动指标与框架检查
-
-```powershell
 npm.cmd run metrics
-node --test --test-isolation=none scripts/metrics.test.mjs
 ```
 
-指标由 `scripts/metrics.ps1` 从 Git 导出 final 与 HEAD 快照，再由 AST 脚本生成文件清单、模块职责、物理行数与函数圈复杂度。输出到题目指定的 `docs/metrics/`，按内核、装配处、CLI 插件拆分，VSCode 扩展单列。统计口径、真实提交哈希、逐文件与逐函数明细均随输出记录；不读取未提交源码，不手填数字。
+| 验证范围 | 结果与依据 |
+| --- | --- |
+| CLI | 176 项通过：保留原 95 项断言，新增扩展点、加载器、插件与边界测试 |
+| VSCode | 9 项自动化测试通过，另有上述真实运行截图；替身测试不代替界面验证 |
+| 指标与会话 | 4 项指标口径测试、2 项完整会话测试通过 |
+| 加载器 | 四条失败路径、重复注册、整包回滚、禁用、options、相对路径、包名与配置整体预检 |
+| dir | 测试替身及真实临时目录组合；成功/失败均保留状态和历史；固定目录两种装配输出一致，日志写在目录之外 |
+| 属性与 box | 多部件整体 undo/redo、部分失败恢复、冲突策略、id 冲突、结构保护、读回失败和缺省降级 |
+| dirty | 编辑→保存→再编辑→undo→redo、新节点、祖先传播、删除/排序/画布变化、失败 IO 和标签共存 |
+| Phase 1 | 禁用新增插件，以真实 CLI 入口对照 final 回放基础及流程图会话；help/tree 等输出和生成 SVG 逐字节一致 |
+| 双装配 | 命令插件会话及题目 §6.1 box 会话输出、保存 SVG 逐字节一致；diamond 也有独立装配对比 |
 
-分析器使用固定的开发工具依赖 `typescript-analysis`（TypeScript 6.0.3 的 npm 别名）。它只用于指标解析，build/check 显式调用原 TypeScript 7 编译器，避免两个包提供同名 tsc 命令的冲突。4 项指标测试验证嵌套函数、字符串/注释/类型排除、顶层分支及循环等口径。
+[会话目录](transcript/) 将输入命令、配置、初始 SVG、预期输出和保存图形分开。command-plugins.code/config.txt 对应固定目录会话；box.code/config.txt 对应题目 §6.1。回放工具为 scripts/replay-command-plugins.mjs 与 scripts/replay-box.mjs。输入无 svg> 提示符或示例输出；输出证据通过 .gitattributes 固定 LF，仍按原始字节比较。
 
-脚本同时检查静态 import/export 的反向依赖，当前提交无内核导入插件或宿主、插件导入宿主的情况。加载器是否硬编码具体插件、公开能力边界及实际接入提交差异仍需人工检查。当前输出是阶段快照，最后需执行 `& ./scripts/metrics.ps1 -BaseRef final -TargetRef p2` 生成最终历史对比；输出自身的后续文档提交不改变目标源码指标，已有标签不移动。
+代码接入演示分支 `demo/box-code`：提交 `d039c1c`，父版本 `f544a0c`，只新增同一 box 包及测试，运行代码仅修改 src/main.ts。配置接入提交 `7ce2bdf` 只新增插件并修改配置，没有改既有运行代码。演示分支保留供验收，不合并至 main。可复核：
 
+```powershell
+git diff --name-status d039c1c^ d039c1c
+git diff --name-status 7ce2bdf^ 7ce2bdf
+git diff d039c1c^ d039c1c -- src/model src/commands src/io src/application src/cli src/extensions src/host plugins/builtin-shapes plugins/builtin-commands plugins/stats plugins/dir
+```
+
+第三条应为空，且这些目录实际存在。stats、dir、box、star、diamond 接入各有普通提交，保留了开发过程。最终需确认远程 demo/box-code 可访问，不能只依赖本地记录。
+
+### 一致性与指标自查
+
+实际模块遵循“宿主选择实现、内核依赖契约、插件使用公开能力”的规则；创建与读回共用图形注册表，代码与配置共用激活事务。原来的两处名称枚举已移到内置插件，后续插件接入没有增加内核分支。公开 Token 类型仍位于 CLI 目录，属于显式契约类型依赖；配置加载器和插件包中的适配器分别承担允许的外部访问。
+
+[指标报告](../docs/metrics/README.md) 与 [详细数据](../docs/metrics/metrics.json) 由 scripts/metrics.ps1 从 Git 快照生成，列出文件职责、物理行数、实现函数圈复杂度及增量；按内核/装配处/插件拆分，VSCode 单列，依赖、测试和构建产物排除。统计口径与真实提交哈希写入报告，不手填数字。静态 import/export 检查未发现内核导入宿主/插件或插件导入宿主；动态加载与具体插件无硬编码也另行人工核对。
+
+指标先以最终源码提交为快照，文档收尾后再核对 p2 与该源码树是否一致；不为更新统计而移动已有标签。复杂度增加包含加载、校验与失败路径，不能只凭总量断言质量改善。当前限制为全量历史快照、标签重复内容比较，以及 diamond 仅支持本插件格式的 polygon。
+
+### 与 AI 协作时的检查和修正
+
+| 节点 | AI 辅助内容 | 我的检查、修正与验证依据 |
+|---|---|---|---|
+| VSCode 实践 | 提供注册API、装饰逻辑、源码范围适配的设计思路与草稿 | 观察原生大纲能力，手动核对标记、层级、定位、未保存更新、异常恢复，全程截图留存证据，独立调整代码落地 |
+| 大纲排查 | 给出文件诊断、编辑器与启动配置的排查方向 | 针对“无法提供大纲信息”问题，调试验证修复方案 |
+| 框架拆分 | 给出模块拆分思路：图形创建、文件读回、帮助模块解耦，再对接命令、属性、树接口 | 对照原有95项断言、历史会话用例校验，补全逻辑，防止仅修复创建入口、遗漏SVG读回链路 |
+| 属性事务 | 提供多目标修改、部分失败场景的测试设计思路 | 实现冲突拒绝逻辑；测试验证：多部件批量修改归为单次undo，报错时文档状态保留、redo链路正常 |
+| 加载器 | 提供暂存机制、整体校验的设计草稿 | 实现四类加载失败、重复注册、异常吞错场景；区分顶层模块缺失、依赖异常、求值失败等不同报错分支 |
+| 命令与box | 提供适配器、复合结构、边界用例的设计思路 | 采用固定真实目录测试，处理派生id冲突、结构保护、降级逻辑，完整会话验证，不只校验成功提示 |
+| 树标签 | 提供内容比对、状态机的测试方案思路 | 验证新建标记、祖先状态传播、注册顺序影响；测试undo回滚后，保存状态标记正常消失 |
+| Windows换行 | 提示字节比对失败的排查方向 | 定位根因是CRLF/LF换行差异，手动统一校验基准为LF |
+| 指标与选做 | 提供AST指标统计、diamond方案设计思路 | 实现分支统计，规避字符串/类型误统计问题；保留原有编译器，明确polygon读回、统计模块的边界限制 |

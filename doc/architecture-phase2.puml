@@ -1,61 +1,55 @@
 @startuml
-title Phase 2 当前框架（box 与树标签待接入）
-left to right direction
-package "启动与宿主\nsrc/main.ts, src/host" as Host {
-  [组合根与默认装配] as Main
-  [PluginLoader] as Loader
-  [PluginHost\n暂存 / 校验 / 发布] as Activation
+title Phase 2 模块依赖与插件装配
+skinparam defaultFontName Microsoft YaHei
+skinparam componentStyle rectangle
+skinparam packageStyle rectangle
+top to bottom direction
+package "启动与宿主" as Host {
+  [main / 默认装配] as Main
+  [PluginLoader\n配置 / 动态导入] as Loader
+  [PluginHost\n暂存 / 校验 / 提交] as Activation
 }
 package "CLI 内核" as Core {
-  [cli\n分词 / 注册分派 / 树渲染] as CLI
+  [cli\n分词 / 命令分派 / 树渲染] as CLI
   [application\n会话 / 保存点] as App
-  [commands\n编辑事务 / 历史] as Cmd
-  [model\n领域对象 / 图形注册] as Model
-  [io\nSVG 与文件访问] as IO
-  [extensions\n四个接口 / 上下文 / 注册表] as API
+  [commands\n编辑事务 / 快照历史] as Cmd
+  [io\nSVG / 文件端口] as IO
+  [model\n图形 / 文档 / 图形注册] as Model
+  [extensions\n四类扩展接口 / 上下文 / 注册表] as API
 }
-package "CLI 插件\nplugins" as Plugins {
-  [builtin-shapes] as Shapes
-  [builtin-commands] as Commands
-  [stats] as Stats
-  [dir\nDirectoryAccess / NodeDirectoryAccess] as Dir
+package "插件包" as Plugins {
+  [builtin-shapes / builtin-commands]
+  [stats / dir]
+  [box / tree-star]
+  [diamond（选做）]
 }
 Main --> Loader
 Main --> Activation
-Main --> Shapes : 代码装配
-Main --> Commands : 代码装配
-Main --> App
-Main --> IO
+Main --> Plugins : 代码装配选择
 Loader --> Activation : 配置装配共用注册路径
 Activation --> API
 Activation --> CLI
-Activation --> Model
 CLI --> API
-CLI --> Model
 App --> Cmd
-App --> Model
 App --> IO
-Cmd --> API
-Cmd --> Model
-Model --> API
+App --> Model
 IO --> Model
-API --> Model : 领域类型
+Cmd --> Model
+Cmd --> API
+Model --> API : 提供器契约
+API --> Model : 公开领域类型
 API --> Cmd : 编辑事务契约
 API --> CLI : 公开 Token 类型
-Shapes --> API
-Shapes --> Model
-Commands --> API
-Commands --> Cmd
-Commands --> Model
-Commands --> CLI : 公开 Token 类型
-Stats --> API
-Stats --> Model
-Dir --> API
-note bottom of Loader
-  模块名动态解析；没有具体插件映射
+Plugins --> API
+Plugins --> Model
+Plugins --> Cmd : 内置编辑命令
+note bottom of Plugins
+  每个实现独立注册；新增可选插件不修改内核和既有插件。
+  dir 的 NodeDirectoryAccess 适配文件系统，
+  其余插件通过公开领域能力和上下文工作。
 end note
 note bottom of Core
-  内核不导入宿主或插件
-  TypeScript 类型依赖也纳入图示
+  内核不导入宿主或插件。
+  图中包含类型依赖；实际模块导入明细见 metrics.json。
 end note
 @enduml

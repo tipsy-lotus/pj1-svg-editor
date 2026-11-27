@@ -2,7 +2,7 @@
   "baseRef": "final",
   "targetRef": "HEAD",
   "baseCommit": "ce4e37a49d1d3527ea680358810e37cb99f7b654",
-  "targetCommit": "df931623c9c5461a3d479e0bac4dc90f834f22a8",
+  "targetCommit": "eb0cd9c64a359aaf42584fee5afcc333612bc73b",
   "forbiddenStaticDependencies": [],
   "base": [
     {
@@ -1258,6 +1258,179 @@
   ],
   "target": [
     {
+      "path": "plugins/box/src/Box.ts",
+      "category": "plugins",
+      "responsibility": "插件包 box",
+      "lines": 26,
+      "functions": 15,
+      "complexity": 21,
+      "units": [
+        {
+          "line": 7,
+          "complexity": 5
+        },
+        {
+          "line": 9,
+          "complexity": 1
+        },
+        {
+          "line": 10,
+          "complexity": 1
+        },
+        {
+          "line": 14,
+          "complexity": 1
+        },
+        {
+          "line": 16,
+          "complexity": 1
+        },
+        {
+          "line": 17,
+          "complexity": 1
+        },
+        {
+          "line": 18,
+          "complexity": 1
+        },
+        {
+          "line": 19,
+          "complexity": 1
+        },
+        {
+          "line": 19,
+          "complexity": 1
+        },
+        {
+          "line": 20,
+          "complexity": 1
+        },
+        {
+          "line": 20,
+          "complexity": 1
+        },
+        {
+          "line": 21,
+          "complexity": 3
+        },
+        {
+          "line": 24,
+          "complexity": 1
+        },
+        {
+          "line": 25,
+          "complexity": 1
+        },
+        {
+          "line": 25,
+          "complexity": 1
+        }
+      ],
+      "imports": [
+        "../../../src/model/Group.js",
+        "../../../src/model/Rect.js",
+        "../../../src/model/Text.js",
+        "../../../src/model/Shape.js"
+      ]
+    },
+    {
+      "path": "plugins/box/src/BoxAttributes.ts",
+      "category": "plugins",
+      "responsibility": "插件包 box",
+      "lines": 19,
+      "functions": 2,
+      "complexity": 7,
+      "units": [
+        {
+          "line": 8,
+          "complexity": 3
+        },
+        {
+          "line": 9,
+          "complexity": 4
+        }
+      ],
+      "imports": [
+        "../../../src/extensions/AttributeHandler.js",
+        "../../../src/extensions/AttributeContext.js",
+        "../../../src/model/Shape.js",
+        "./Box.js"
+      ]
+    },
+    {
+      "path": "plugins/box/src/BoxPlugin.ts",
+      "category": "plugins",
+      "responsibility": "插件包 box",
+      "lines": 15,
+      "functions": 1,
+      "complexity": 1,
+      "units": [
+        {
+          "line": 8,
+          "complexity": 1
+        }
+      ],
+      "imports": [
+        "../../../src/extensions/Plugin.js",
+        "../../../src/extensions/PluginContext.js",
+        "./BoxProvider.js",
+        "./BoxAttributes.js",
+        "./BoxTypeDecorator.js"
+      ]
+    },
+    {
+      "path": "plugins/box/src/BoxProvider.ts",
+      "category": "plugins",
+      "responsibility": "插件包 box",
+      "lines": 29,
+      "functions": 4,
+      "complexity": 7,
+      "units": [
+        {
+          "line": 11,
+          "complexity": 2
+        },
+        {
+          "line": 14,
+          "complexity": 1
+        },
+        {
+          "line": 22,
+          "complexity": 2
+        },
+        {
+          "line": 25,
+          "complexity": 2
+        }
+      ],
+      "imports": [
+        "../../../src/extensions/ShapeProvider.js",
+        "../../../src/extensions/SvgShapeSource.js",
+        "../../../src/model/Rect.js",
+        "../../../src/model/Text.js",
+        "./Box.js"
+      ]
+    },
+    {
+      "path": "plugins/box/src/BoxTypeDecorator.ts",
+      "category": "plugins",
+      "responsibility": "插件包 box",
+      "lines": 8,
+      "functions": 1,
+      "complexity": 2,
+      "units": [
+        {
+          "line": 7,
+          "complexity": 2
+        }
+      ],
+      "imports": [
+        "../../../src/extensions/TreeDecorator.js",
+        "../../../src/extensions/TreeContext.js",
+        "./Box.js"
+      ]
+    },
+    {
       "path": "plugins/builtin-commands/src/BuiltinCommandsPlugin.ts",
       "category": "plugins",
       "responsibility": "插件包 builtin-commands",
@@ -1512,6 +1685,115 @@
       ]
     },
     {
+      "path": "plugins/diamond/src/Diamond.ts",
+      "category": "plugins",
+      "responsibility": "插件包 diamond",
+      "lines": 42,
+      "functions": 10,
+      "complexity": 12,
+      "units": [
+        {
+          "line": 6,
+          "complexity": 1
+        },
+        {
+          "line": 10,
+          "complexity": 1
+        },
+        {
+          "line": 11,
+          "complexity": 1
+        },
+        {
+          "line": 16,
+          "complexity": 2
+        },
+        {
+          "line": 21,
+          "complexity": 1
+        },
+        {
+          "line": 25,
+          "complexity": 1
+        },
+        {
+          "line": 29,
+          "complexity": 1
+        },
+        {
+          "line": 33,
+          "complexity": 2
+        },
+        {
+          "line": 38,
+          "complexity": 1
+        },
+        {
+          "line": 40,
+          "complexity": 1
+        }
+      ],
+      "imports": [
+        "../../../src/model/Shape.js",
+        "../../../src/model/Value.js"
+      ]
+    },
+    {
+      "path": "plugins/diamond/src/DiamondPlugin.ts",
+      "category": "plugins",
+      "responsibility": "插件包 diamond",
+      "lines": 9,
+      "functions": 1,
+      "complexity": 1,
+      "units": [
+        {
+          "line": 6,
+          "complexity": 1
+        }
+      ],
+      "imports": [
+        "../../../src/extensions/Plugin.js",
+        "../../../src/extensions/ShapeProvider.js",
+        "./DiamondProvider.js"
+      ]
+    },
+    {
+      "path": "plugins/diamond/src/DiamondProvider.ts",
+      "category": "plugins",
+      "responsibility": "插件包 diamond",
+      "lines": 32,
+      "functions": 5,
+      "complexity": 15,
+      "units": [
+        {
+          "line": 10,
+          "complexity": 4
+        },
+        {
+          "line": 16,
+          "complexity": 2
+        },
+        {
+          "line": 19,
+          "complexity": 7
+        },
+        {
+          "line": 23,
+          "complexity": 1
+        },
+        {
+          "line": 26,
+          "complexity": 1
+        }
+      ],
+      "imports": [
+        "../../../src/extensions/ShapeProvider.js",
+        "../../../src/extensions/SvgShapeSource.js",
+        "../../../src/model/Value.js",
+        "./Diamond.js"
+      ]
+    },
+    {
       "path": "plugins/dir/src/DirCommand.ts",
       "category": "plugins",
       "responsibility": "插件包 dir",
@@ -1668,6 +1950,69 @@
         "../../../src/extensions/Command.js",
         "../../../src/extensions/EditorAccess.js",
         "./StatsCommand.js"
+      ]
+    },
+    {
+      "path": "plugins/tree-star/src/ModifiedStar.ts",
+      "category": "plugins",
+      "responsibility": "插件包 tree-star",
+      "lines": 37,
+      "functions": 7,
+      "complexity": 14,
+      "units": [
+        {
+          "line": 12,
+          "complexity": 6
+        },
+        {
+          "line": 22,
+          "complexity": 1
+        },
+        {
+          "line": 23,
+          "complexity": 3
+        },
+        {
+          "line": 25,
+          "complexity": 1
+        },
+        {
+          "line": 27,
+          "complexity": 1
+        },
+        {
+          "line": 29,
+          "complexity": 1
+        },
+        {
+          "line": 34,
+          "complexity": 1
+        }
+      ],
+      "imports": [
+        "../../../src/extensions/TreeDecorator.js",
+        "../../../src/extensions/TreeContext.js",
+        "../../../src/model/SvgDocument.js",
+        "../../../src/model/Shape.js"
+      ]
+    },
+    {
+      "path": "plugins/tree-star/src/TreeStarPlugin.ts",
+      "category": "plugins",
+      "responsibility": "插件包 tree-star",
+      "lines": 11,
+      "functions": 1,
+      "complexity": 1,
+      "units": [
+        {
+          "line": 6,
+          "complexity": 1
+        }
+      ],
+      "imports": [
+        "../../../src/extensions/Plugin.js",
+        "../../../src/extensions/TreeDecorator.js",
+        "./ModifiedStar.js"
       ]
     },
     {
