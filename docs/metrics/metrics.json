@@ -1,8 +1,8 @@
 {
   "baseRef": "final",
-  "targetRef": "HEAD",
+  "targetRef": "p2",
   "baseCommit": "ce4e37a49d1d3527ea680358810e37cb99f7b654",
-  "targetCommit": "eb0cd9c64a359aaf42584fee5afcc333612bc73b",
+  "targetCommit": "d032b9ffb222c63c406a020d8d77e3b4ffb441d4",
   "forbiddenStaticDependencies": [],
   "base": [
     {

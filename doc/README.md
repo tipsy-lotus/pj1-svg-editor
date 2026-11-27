@@ -167,7 +167,7 @@ CLI 的 `Tokenizer` 保留参数是否加引号，`CommandDispatcher` 集中分�
 
 ## Phase 2：插件实践与插件式重构
 
-本阶段在 Phase 1 的同一仓库继续开发，完成 VSCode SVG 扩展、CLI 插件框架、必做插件，并选做 diamond 判断框。Phase 1 的代码和报告保存在已有 `final` 标签中；本阶段最终标签使用 `p2`，已有标签不移动。目前源码已合并，文档、指标和标签正在收尾。
+本阶段在 Phase 1 的同一仓库继续开发，完成 VSCode SVG 扩展、CLI 插件框架、必做插件，并选做 diamond 判断框。Phase 1 保存在 `final` 标签，Phase 2 的 `p2` 已固定在 `d032b9f`，已有标签不移动。本文补充对 p2 的正式指标核验及基础会话双装配证据；这些新增核验材料属于标签之后的补充提交，不代表原 p2 已包含新增文件，提交作业时需同时提供补充提交。
 
 ### 运行与目录
 
@@ -295,7 +295,7 @@ npm.cmd --prefix vscode-extension run test:in-process
 
 VSCode 负责界面、编辑更新调度与定位；extension.ts 注册 FileDecorationProvider 与 DocumentSymbolProvider，并通过 subscriptions 释放资源。文件提供器只返回 [] 标记，不改文件名或内容；大纲提供器把独立解析树及字符偏移适配为 DocumentSymbol/Range。
 
-文件装饰与经典 Decorator 都追加展示信息，但没有完整的“同接口包装原对象并转发”结构，不能仅凭名称认定为经典装饰器。大纲提供器体现 Adapter：客户端是 VSCode，被适配数据是 OutlineElement，输出是宿主符号接口。Phase 1 的解析依赖 sax 可复用，但 SvgCodec 会分配 id、限制图形且不保留源码位置，领域树不能直接用于大纲定位，因此扩展独立解析 XML，不依赖 CLI 内部实现。
+文件装饰与经典 Decorator 都追加展示信息，但没有完整的“同接口包装原对象并转发”结构，不能仅凭名称认定为经典装饰器。大纲提供器体现 Adapter：客户端是 VSCode，被适配数据是 OutlineElement，输出是宿主符号接口。Phase 1 的 SvgCodec 直接使用 xml-js，xml-js 内部依赖 sax；VSCode 扩展则直接使用 sax。由于 SvgCodec 会分配 id、限制图形且不保留源码位置，领域树不能直接用于大纲定位，因此扩展独立解析 XML，不复用 CLI 的编解码实现。
 
 我已在开发窗口观察原始大纲、验证嵌套与无 id 元素、点击定位、未保存更新和不完整 XML 恢复。下面均为实际运行截图，题目附带的 JPG 不作为证据；若同时出现 XML 与 PJ1 SVG Tools 两组大纲，本项目对应后者，U 是 Git 状态而非 SVG 标记。
 
@@ -310,24 +310,26 @@ VSCode 负责界面、编辑更新调度与定位；extension.ts 注册 FileDeco
 ```powershell
 npm.cmd run check
 npm.cmd run test:in-process
-node --test --test-isolation=none scripts/metrics.test.mjs scripts/box-session.test.mjs scripts/command-session.test.mjs
+node --test --test-isolation=none scripts/metrics.test.mjs scripts/basic-session.test.mjs scripts/box-session.test.mjs scripts/command-session.test.mjs
 & ./scripts/check-phase1.ps1
-npm.cmd run metrics
+& ./scripts/metrics.ps1 -BaseRef final -TargetRef p2
 ```
 
 | 验证范围 | 结果与依据 |
 | --- | --- |
 | CLI | 176 项通过：保留原 95 项断言，新增扩展点、加载器、插件与边界测试 |
 | VSCode | 9 项自动化测试通过，另有上述真实运行截图；替身测试不代替界面验证 |
-| 指标与会话 | 4 项指标口径测试、2 项完整会话测试通过 |
+| 指标与会话 | 4 项指标口径测试、3 项完整会话测试通过；基础会话测试覆盖基础与流程图两份输入 |
 | 加载器 | 四条失败路径、重复注册、整包回滚、禁用、options、相对路径、包名与配置整体预检 |
 | dir | 测试替身及真实临时目录组合；成功/失败均保留状态和历史；固定目录两种装配输出一致，日志写在目录之外 |
 | 属性与 box | 多部件整体 undo/redo、部分失败恢复、冲突策略、id 冲突、结构保护、读回失败和缺省降级 |
 | dirty | 编辑→保存→再编辑→undo→redo、新节点、祖先传播、删除/排序/画布变化、失败 IO 和标签共存 |
 | Phase 1 | 禁用新增插件，以真实 CLI 入口对照 final 回放基础及流程图会话；help/tree 等输出和生成 SVG 逐字节一致 |
-| 双装配 | 命令插件会话及题目 §6.1 box 会话输出、保存 SVG 逐字节一致；diamond 也有独立装配对比 |
+| 双装配 | 基础、流程图、新命令及题目 §6.1 box 会话输出、保存 SVG 逐字节一致；diamond 也有独立装配对比 |
 
 [会话目录](transcript/) 将输入命令、配置、初始 SVG、预期输出和保存图形分开。command-plugins.code/config.txt 对应固定目录会话；box.code/config.txt 对应题目 §6.1。回放工具为 scripts/replay-command-plugins.mjs 与 scripts/replay-box.mjs。输入无 svg> 提示符或示例输出；输出证据通过 .gitattributes 固定 LF，仍按原始字节比较。
+
+补充的基础会话输入为 `cli-1.txt` 和 `cli-1-flowchart.txt`，分别由既有 basic-session.cli、flowchart.cli 加上 help 查询构成，保留完整命令与注释。`basic.config.json` 按相同顺序装入 stats、dir、box、tree-star、diamond；代码装配使用同一批实现、相同顺序与 options。每份输入的两种运行使用同一工作目录和初始 SVG，真实文件适配器与 REPL 参与。输出为同名前缀的 `.code.txt`、`.config.txt`，保存结果为 `.saved.svg`。执行 `node scripts/replay-basic.mjs` 可重生成证据，测试直接按字节比较；这与禁用插件对照 final 的兼容性检查是两项不同验证。
 
 代码接入演示分支 `demo/box-code`：提交 `d039c1c`，父版本 `f544a0c`，只新增同一 box 包及测试，运行代码仅修改 src/main.ts。配置接入提交 `7ce2bdf` 只新增插件并修改配置，没有改既有运行代码。演示分支保留供验收，不合并至 main。可复核：
 
@@ -345,7 +347,7 @@ git diff d039c1c^ d039c1c -- src/model src/commands src/io src/application src/c
 
 [指标报告](../docs/metrics/README.md) 与 [详细数据](../docs/metrics/metrics.json) 由 scripts/metrics.ps1 从 Git 快照生成，列出文件职责、物理行数、实现函数圈复杂度及增量；按内核/装配处/插件拆分，VSCode 单列，依赖、测试和构建产物排除。统计口径与真实提交哈希写入报告，不手填数字。静态 import/export 检查未发现内核导入宿主/插件或插件导入宿主；动态加载与具体插件无硬编码也另行人工核对。
 
-指标取自 Git 中的源码快照，具体比较版本见指标报告。复杂度增量包含新增的加载、校验和失败处理逻辑，不单独作为质量改善的依据。当前实现采用全量快照管理历史，树标签会重复比较内容，大文档下仍有优化空间；diamond 仅支持读回本插件定义的 polygon 格式。
+指标已从 final 与 p2 的 Git 快照正式生成，报告明确记录标签和对应提交哈希，不再使用阶段快照说明。复核确认旧统计提交 eb0cd9c 与 p2 的 src、plugins、vscode-extension 源码一致，逐文件指标数据也一致，因此本次修订更新核验对象与说明，数字未改变。新增脚本和文档不进入 p2 的源码指标范围。复杂度增量包含新增的加载、校验和失败处理逻辑，不单独作为质量改善的依据。当前实现采用全量快照管理历史，树标签会重复比较内容，大文档下仍有优化空间；diamond 仅支持读回本插件定义的 polygon 格式。
 
 ### 与 AI 协作时的检查和修正
 

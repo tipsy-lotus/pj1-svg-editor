@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="800" height="300" viewBox="0 0 800 300">
+  <g id="flowchart">
+    <g id="node1">
+      <rect x="120" y="100" width="160" height="60" fill="#4a90d9" id="start"/>
+      <text x="155" y="135" fill="white" id="start-label">开始</text>
+    </g>
+    <g id="node2">
+      <rect x="520" y="100" width="160" height="60" fill="#f5a623" id="process"/>
+      <text x="545" y="135" fill="white" id="process-label">处理数据 v2</text>
+    </g>
+    <line x1="280" y1="130" x2="520" y2="130" stroke="black" id="edge"/>
+  </g>
+</svg>

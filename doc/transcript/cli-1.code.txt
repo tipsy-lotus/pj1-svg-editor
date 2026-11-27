@@ -1,0 +1,71 @@
+svg-editor 0.1 — type 'help' for commands
+init [w] [h]
+read <file.svg>
+save [file.svg]
+canvas [w h]
+create <type> <id> [params...] [in <containerId>]
+delete <id>
+move <id> <dx> <dy>
+scale <id> <factor>
+set <id> <attr> <value>
+group <newGid> <id1> [id2...]
+ungroup <gid>
+addto <gid> <id>
+front <id>
+back <id>
+tree [id]
+show <id>
+undo
+redo
+help
+quit
+exit
+stats
+dir
+
+Shape parameters:
+  rect <id> <x> <y> <w> <h> [fill]
+  circle <id> <cx> <cy> <r> [fill]
+  ellipse <id> <cx> <cy> <rx> <ry> [fill]
+  line <id> <x1> <y1> <x2> <y2> [stroke]
+  text <id> <x> <y> "content"
+  g <id>
+  box <id> <x> <y> <w> <h> "label"
+  diamond <id> <cx> <cy> <w> <h> [fill]
+All create commands accept [in <containerId>]. Use double quotes for spaces.
+Only whole lines starting with # are comments. EOF, quit or exit closes the editor.
+canvas 800x600 created
+rect#bg created
+text#title created
+circle#c1 created
+rect#box created
+g#markers created with 2 children
+svg (800x600) *
+├── rect#bg  x=0 y=0 width=800 height=600 fill=#ffffff *
+├── text#title  x=20 y=40 "My Diagram" *
+└── g#markers *
+    ├── circle#c1  cx=100 cy=100 r=20 fill=red *
+    └── rect#box  x=200 y=80 width=60 height=60 fill=#3366ff *
+circle#c1 moved by (30,0)
+undone: move c1
+redone: move c1
+text#title updated: text="My Diagram v2"
+undone: set title text
+rect#box deleted
+undone: delete box
+rect#bg moved to front
+rect#bg moved to back
+saved to demo.svg (5 elements)
+warning: assigned id rect1 to unnamed <rect>
+read examples/import-example.svg (7 elements)
+rect#rect1  parent=svg
+  x=0 y=0 width=400 height=300 fill=#ffffff
+svg (400x300)
+├── rect#rect1  x=0 y=0 width=400 height=300 fill=#ffffff
+├── text#title  x=10 y=290 "导入示例 & ID 自动分配"
+├── circle#c1  cx=50 cy=50 r=10
+├── g#g1
+│   ├── rect#r2  x=0 y=0 width=10 height=10
+│   └── circle#c2  cx=5 cy=5 r=2
+└── ellipse#e1  cx=1 cy=2 rx=3 ry=4
+bye

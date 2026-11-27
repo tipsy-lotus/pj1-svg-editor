@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="800" height="600" viewBox="0 0 800 600">
+  <rect x="0" y="0" width="800" height="600" fill="#ffffff" id="bg"/>
+  <text x="20" y="40" id="title">My Diagram</text>
+  <g id="markers">
+    <circle cx="130" cy="100" r="20" fill="red" id="c1"/>
+    <rect x="200" y="80" width="60" height="60" fill="#3366ff" id="box"/>
+  </g>
+</svg>

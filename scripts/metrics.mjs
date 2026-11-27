@@ -44,7 +44,8 @@ const report = { baseRef, targetRef, baseCommit, targetCommit, forbiddenStaticDe
 mkdirSync(resolve(output), { recursive: true });
 writeFileSync(join(output, 'metrics.json'), JSON.stringify(report, null, 2) + '\n');
 const lines = ['# CLI 重构指标（脚本生成）', '', `基线：${baseRef} (${baseCommit})`, `目标：${targetRef} (${targetCommit})`, '',
-  '当前是阶段快照；收尾必须用 final 与 p2 再生成。统计来自已提交的 Git 快照，不包含工作区未提交内容。', '',
+  targetRef === 'p2' ? '本报告正式核验 final 与 p2 的 Git 源码快照，不包含工作区及 p2 之后的补充提交。'
+    : '当前是阶段快照；收尾应使用 final 与 p2 正式核验。统计来自已提交的 Git 快照，不包含工作区未提交内容。', '',
   '| 分类 | 基线文件 / 行数 / CC | 目标文件 / 行数 / CC | 行数增量 | CC 增量 |', '| --- | --- | --- | --- | --- |'];
 for (const category of ['kernel', 'assembly', 'plugins', 'vscode']) {
   const a = totals(base, category), b = totals(target, category);

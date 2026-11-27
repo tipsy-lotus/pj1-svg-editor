@@ -1,0 +1,70 @@
+svg-editor 0.1 — type 'help' for commands
+init [w] [h]
+read <file.svg>
+save [file.svg]
+canvas [w h]
+create <type> <id> [params...] [in <containerId>]
+delete <id>
+move <id> <dx> <dy>
+scale <id> <factor>
+set <id> <attr> <value>
+group <newGid> <id1> [id2...]
+ungroup <gid>
+addto <gid> <id>
+front <id>
+back <id>
+tree [id]
+show <id>
+undo
+redo
+help
+quit
+exit
+stats
+dir
+
+Shape parameters:
+  rect <id> <x> <y> <w> <h> [fill]
+  circle <id> <cx> <cy> <r> [fill]
+  ellipse <id> <cx> <cy> <rx> <ry> [fill]
+  line <id> <x1> <y1> <x2> <y2> [stroke]
+  text <id> <x> <y> "content"
+  g <id>
+  box <id> <x> <y> <w> <h> "label"
+  diamond <id> <cx> <cy> <w> <h> [fill]
+All create commands accept [in <containerId>]. Use double quotes for spaces.
+Only whole lines starting with # are comments. EOF, quit or exit closes the editor.
+canvas 800x300 created
+g#flowchart created
+g#node1 created in g#flowchart
+rect#start created in g#node1
+text#start-label created in g#node1
+text#start-label updated: fill="white"
+g#node2 created in g#flowchart
+rect#process created in g#node2
+text#process-label created in g#node2
+text#process-label updated: fill="white"
+line#edge created in g#flowchart
+g#node2 moved by (0,100)
+undone: move node2
+redone: move node2
+undone: move node2
+text#process-label updated: text="处理数据 v2"
+text#process-label  parent=g#node2
+  x=545 y=135 fill=white
+  text="处理数据 v2"
+svg (800x300) *
+└── g#flowchart *
+    ├── g#node1 *
+    │   ├── rect#start  x=120 y=100 width=160 height=60 fill=#4a90d9 *
+    │   └── text#start-label  x=155 y=135 fill=white "开始" *
+    ├── g#node2 *
+    │   ├── rect#process  x=520 y=100 width=160 height=60 fill=#f5a623 *
+    │   └── text#process-label  x=545 y=135 fill=white "处理数据 v2" *
+    └── line#edge  x1=280 y1=130 x2=520 y2=130 stroke=black *
+saved to flowchart.svg (8 elements)
+read flowchart.svg (8 elements)
+g#node2
+├── rect#process  x=520 y=100 width=160 height=60 fill=#f5a623
+└── text#process-label  x=545 y=135 fill=white "处理数据 v2"
+bye
